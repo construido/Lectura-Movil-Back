@@ -8,7 +8,7 @@ use App\Models\GeneracionLecturaFoto;
 
 class GeneracionLecturaFotoController extends Controller
 {
-    public function imagenStore($imagen, $GeneracionFactura, $Cobro, $CodigoUbicacion, $Cliente, $EmpresaNombre)
+    public function imagenStore($imagen, $GeneracionFactura, $Cobro, $CodigoUbicacion, $Cliente, $EmpresaNombre, $DataBaseAlias)
     {
         try {
             $file = $imagen;
@@ -20,7 +20,7 @@ class GeneracionLecturaFotoController extends Controller
                 $fileName = $namePDF . '_' . ($i + 1) . '.jpg';
                 $path = $EmpresaNombre . '/' . 'Foto/' . $fileName;
 
-                $loUsuario = GeneracionLecturaFoto::on('mysql_LMCoopaguas')->create([
+                $loUsuario = GeneracionLecturaFoto::on($DataBaseAlias)->create([
                     'GeneracionFactura' => $GeneracionFactura,
                     'Cliente'           => $Cliente,
                     'Serial'            => $i + 1,

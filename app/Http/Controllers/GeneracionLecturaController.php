@@ -433,8 +433,8 @@ class GeneracionLecturaController extends Controller
         if ($loGeneracionLectura['Error'] == 2000) {
             $loPaquete->values = $loGeneracionLectura;
             if ($request->file('imageEnviar')){
-                $GeneracionLecturaFoto->imagenStore($request->file('imageEnviar'), $request->input('tnGeneracionFactura'),
-                $request->input('tnCobro'), $request->input('tnCodigoUbicacion'), $request->input('tnCliente'), $request->input('EmpresaNombre'));
+                $GeneracionLecturaFoto->imagenStore($request->file('imageEnviar'), $request->input('tnGeneracionFactura'), $request->input('tnCobro'),
+                $request->input('tnCodigoUbicacion'), $request->input('tnCliente'), $request->input('EmpresaNombre'), $request->input('DataBaseAlias'));
             }
         }else{
             $loPaquete->error   = 1;
