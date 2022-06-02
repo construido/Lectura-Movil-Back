@@ -18,6 +18,7 @@ use App\DAL\FacturaDAL;
 use App\DAL\CategoriaDAL;
 
 use App\Http\Controllers\GeneracionLecturaFotoController;
+use App\Http\Controllers\TrayectoriaController;
 
 // La primera indica el tipo de variable
 // •	l - Local
@@ -395,6 +396,7 @@ class GeneracionLecturaController extends Controller
      */
     public function DO_LecturarNormal(Request $request){
         $GeneracionLecturaFoto  = new GeneracionLecturaFotoController;
+        $loTrayectoria          = new TrayectoriaController;
         $loGeneracionLecturaBLL = new GeneracionLecturaBLL;
         $loPaquete              = new mPaqueteTodoFacil();
         $loGeneracionLectura    = [];
@@ -435,6 +437,11 @@ class GeneracionLecturaController extends Controller
             if ($request->file('imageEnviar')){
                 $GeneracionLecturaFoto->imagenStore($request->file('imageEnviar'), $request->input('tnGeneracionFactura'), $request->input('tnCobro'),
                 $request->input('tnCodigoUbicacion'), $request->input('tnCliente'), $request->input('EmpresaNombre'), $request->input('DataBaseAlias'));
+            }
+
+            if ($request->input('Latitud') && $request->input('Longitud')) {
+                $loTrayectoria->GuardarUbicacion($request->input('tnGeneracionFactura'), /*$request->input('tnPlomero'),*/ $request->input('tnCliente'), 
+                $request->input('Latitud'), $request->input('Longitud'), $request->input('DataBaseAlias'));
             }
         }else{
             $loPaquete->error   = 1;

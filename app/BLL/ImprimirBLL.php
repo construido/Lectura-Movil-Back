@@ -249,6 +249,6 @@ class ImprimirBLL
         $path = public_path() . $file . '/' . $namePDF . '.pdf';
         $pdf->save($path);
         $host = $_SERVER["HTTP_HOST"];
-        return "http://" . $host . $file . '/' . $namePDF . '.pdf';
+        return "https://docs.google.com/viewerng/viewer?url=http://" . $host . $file . '/' . $namePDF . '.pdf';
     }
 }
