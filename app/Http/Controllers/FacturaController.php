@@ -67,4 +67,9 @@ class FacturaController extends Controller
             ]);
         }
     }
+
+    // public function Prueba(Request $request){
+    //     $loFactura = 'http://192.168.100.95:8000/COSEPW/PDF/12831_2022-05_010100600_512_2022-06-01_19-58-38.pdf';
+    //     return $loFactura;
+    // }
 }
