@@ -60,8 +60,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/CrearFactura', [FacturaController::class,'CrearFactura']);
 });
 
-// Route::get('/Prueba', [FacturaController::class,'Prueba']);
-
 //----------------------------------------------------------------------//
 //----------------------------------------------------------------------//
 // php artisan serve --host=ip
