@@ -210,7 +210,7 @@ class FacturaBLL
             if($this->goCategoria[0]->ComoAplicaMinimo == 1)
             {
                 $lnMonto = $this->gnLecturado ? $lnPrecioConMedidor : $lnPrecioSinMedidor;
-                $lnTotal = $this->actIPC($lnMonto);  //Ojo a la variable : Lecturado
+                $lnTotal = $this->actIPC($lnMonto);
 
                 if (!$this->gnLecturado){ //!Lecturado 
                     return $lnTotal;

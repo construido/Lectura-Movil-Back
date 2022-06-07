@@ -56,6 +56,19 @@ class FacturaDAL
         return 0;
     }
 
+    public function ActualizarFacturaSinMedidor($Factura, $GeneracionFactura, $Cliente, $DataBaseAlias){
+        $loFactura = Factura::on($DataBaseAlias)
+            ->where('Factura', '=', $Factura)
+            ->where('Cliente', '=', $Cliente)
+            ->update([
+                "FechaLectura"       => date("Y-m-d"),
+                "Hora"               => date("H:i:s"),
+                "GeneracionFactura"  => $GeneracionFactura,
+                'Usr'                => JWTAuth::user()->Usuario,
+            ]);
+    return 0;
+}
+
     public function GetDatosFacturaSocio($GeneracionFactura, $Cliente, $DataBaseAlias){
         $loFactura = Factura::on($DataBaseAlias)
             ->where('GeneracionFactura', '=', $GeneracionFactura)

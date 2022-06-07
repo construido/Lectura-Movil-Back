@@ -10,6 +10,7 @@ use App\BLL\FacturaBLL;
 
 use App\DAL\GeneracionLecturaDAL;
 use App\DAL\ClienteDAL;
+use App\DAL\FacturaDAL;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
@@ -25,6 +26,7 @@ class FacturaController extends Controller
             $EmpresaNombre     = $request->EmpresaNombre;
 
             $loClienteDAL = new ClienteDAL;
+            $loFacturaDAL = new FacturaDAL;
             $loFacturaBLL = new FacturaBLL;
             $textimprimir = new ImprimirBLL;
             $loPaquete    = new mPaqueteTodoFacil();
@@ -38,15 +40,22 @@ class FacturaController extends Controller
                 $loPaquete->values  = $FacturaGenerada;
                 return response()->json($loPaquete);
             }
-            
-            $lnOkFactura = $loFacturaBLL->RecalcularFacturaFull($GeneracionFactura, $Cliente, $Plomero, $DataBaseAlias);
-            if ($lnOkFactura == -1) {
-                $loPaquete->error   = 1;
-                $loPaquete->status  = 0;
-                $loPaquete->message = "Error al generar Factura...";
-                $loPaquete->values  = $lnOkFactura;
-                return response()->json($loPaquete);
-            }
+
+
+            $loClienteDAL = $loClienteDAL->GetIDBy($Cliente, $DataBaseAlias);
+            if ($loClienteDAL[0]->Estado == 1 && $loClienteDAL[0]->Medidor > 0) {
+                $lnOkFactura = $loFacturaBLL->RecalcularFacturaFull($GeneracionFactura, $Cliente, $Plomero, $DataBaseAlias);
+                if ($lnOkFactura == -1) {
+                    $loPaquete->error   = 1;
+                    $loPaquete->status  = 0;
+                    $loPaquete->message = "Error al generar Factura...";
+                    $loPaquete->values  = $lnOkFactura;
+                    return response()->json($loPaquete);
+                }
+            }else{
+                $Factura = $loFacturaDAL->GetIDBy($Cliente, $DataBaseAlias);
+                $loFacturaDAL->ActualizarFacturaSinMedidor($Factura, $GeneracionFactura, $Cliente, $DataBaseAlias);
+            }    
     
             $lnGeneracionLectura = $loGeneracionLecturaDAL->GetIDBy($GeneracionFactura, $Cliente, $DataBaseAlias); // TODO : se le aumento $GeneracionFactura
             $lnCobro            = $lnGeneracionLectura[0]->Cobro;
