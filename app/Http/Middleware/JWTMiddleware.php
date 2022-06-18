@@ -25,6 +25,7 @@ class JWTMiddleware
                 return \response()->json([
                     'status' => false,
                     'message' => 'Invalid Token'
+                // ], 403);
                 ]);
             }
             else{
@@ -32,12 +33,14 @@ class JWTMiddleware
                     return \response()->json([
                         'status' => false,
                         'message' => 'Token expired'
+                    // ], 403);
                     ]);
                 }
                 else{
                     return \response()->json([
                         'status' => false,
                         'message' => 'Token is required'
+                    // ], 403);
                     ]);
                 }
             }

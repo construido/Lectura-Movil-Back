@@ -14,8 +14,8 @@ class Usuario extends Authenticatable implements JWTSubject //extends Model
 
     protected $table        = 'USUARIO';
     protected $primaryKey   = 'Usuario';
-    protected $fillable     = ['Nombre', 'Apellidos', 'Login', 
-                               'Password', 'Correo', 'Estado', 'FechaCreacion', 'Usr', 'UsrHora', 'UsrFecha'];
+    protected $fillable     = ['Nombre', 'Apellidos', 'Login', 'Password', 'Correo', 
+                                'Estado', 'FechaCreacion', 'Usr', 'UsrHora', 'UsrFecha'];
     public $timestamps      = false;
 
     public function getJWTIdentifier(){
