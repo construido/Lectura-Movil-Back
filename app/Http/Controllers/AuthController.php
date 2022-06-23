@@ -42,11 +42,9 @@ class AuthController extends Controller
 
                 if ((JWTAuth::user()->Estado == 1 || JWTAuth::user()->Estado == 5) && $verificar != false) {
 
-                    $data = JWTAuth::user(); // utilizar HELPER para Laravel
-                    // $data['Contrato']      = $verificar[0]->Contrato;
-                    // $data['FechaContrato'] = $verificar[0]->FechaContrato;
-                    // $data['FechaLimite']   = $verificar[0]->FechaLimite;
-                    // $data['Empresa']       = $verificar[0]->Empresa;
+                    // $data = JWTAuth::user(); // utilizar HELPER para Laravel
+                    $data['Nombre']        = JWTAuth::user()->Nombre;
+                    $data['Apellidos']     = JWTAuth::user()->Apellidos;
                     $data['EmpresaNombre'] = $verificar[0]->EmpresaNombre;
                     $data['DataBaseAlias'] = $verificar[0]->DataBaseAlias;
                     $data['Plomero']       = $verificar[0]->Plomero;

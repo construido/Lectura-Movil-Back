@@ -289,6 +289,26 @@ class GeneracionLecturaController extends Controller
      * @param       \Illuminate\Http\Request  $request
      * @return      objeto GENERACIONLECTURA
      */
+    public function verLecturaIdProcesada(Request $request){
+        $lnDataBaseAlias     = $request->DataBaseAlias;
+        $lnGeneracionFactura = $request->input('tcGeneracionFactura');
+        $lnCliente           = $request->input('tcCliente');
+
+        $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC')
+        ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+        ->where('GeneracionFactura', '=', $lnGeneracionFactura)
+        ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
+        ->get();
+
+        $loPaquete = new mPaqueteTodoFacil();
+        $loPaquete->values = $loGeneracionLectura;
+        return response()->json($loPaquete);
+    }
+
     public function verLecturaId(Request $request){
         $lnDataBaseAlias     = $request->DataBaseAlias;
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
@@ -296,7 +316,6 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
-        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
         ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
         ->get();
@@ -339,8 +358,11 @@ class GeneracionLecturaController extends Controller
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC')
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
         ->where(function($query){
             $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')

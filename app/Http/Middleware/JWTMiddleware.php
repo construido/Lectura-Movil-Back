@@ -23,7 +23,7 @@ class JWTMiddleware
         }catch(Exception $e){
             if($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
                 return \response()->json([
-                    'status' => false,
+                    'status' => 403,
                     'message' => 'Invalid Token'
                 // ], 403);
                 ]);
@@ -31,14 +31,14 @@ class JWTMiddleware
             else{
                 if($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
                     return \response()->json([
-                        'status' => false,
+                        'status' => 403,
                         'message' => 'Token expired'
                     // ], 403);
                     ]);
                 }
                 else{
                     return \response()->json([
-                        'status' => false,
+                        'status' => 403,
                         'message' => 'Token is required'
                     // ], 403);
                     ]);

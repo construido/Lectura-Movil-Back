@@ -38,6 +38,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     // RUTAS DE LA TABLA GENERACIONLECTURA DE LA BASE DE DATOS LECTURA MOVIL
     Route::post('/lecturasPendientesLecturados', [GeneracionLecturaController::class, 'lecturasPendientesLecturados']);
     Route::post('/verLecturaIdNextProcesada', [GeneracionLecturaController::class, 'verLecturaIdNextProcesada']);
+    Route::post('/verLecturaIdProcesada', [GeneracionLecturaController::class, 'verLecturaIdProcesada']);
     Route::post('/DO_LecturarNormal', [GeneracionLecturaController::class, 'DO_LecturarNormal']);
     Route::post('/verLecturaIdNext', [GeneracionLecturaController::class, 'verLecturaIdNext']);
     Route::post('/listarProcesadas', [GeneracionLecturaController::class, 'listarProcesadas']);
