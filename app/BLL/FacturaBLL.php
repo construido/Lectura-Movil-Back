@@ -211,7 +211,7 @@ class FacturaBLL
             {
                 $lnMonto = $this->gnLecturado ? $lnPrecioConMedidor : $lnPrecioSinMedidor;
                 $lnTotal = $this->actIPC($lnMonto);
-
+                
                 if (!$this->gnLecturado){ //!Lecturado 
                     return $lnTotal;
                 }
@@ -274,7 +274,7 @@ class FacturaBLL
 
                 $Categoria     = $this->goCategoria[0]->Categoria == 0 ? 1 : $this->goCategoria[0]->Categoria;
                 $ConsumoCnt    = $ConsumoFacturado;
-                $lcFiltro      = $id_categCli;
+                $lcFiltro      = $Categoria;
                 $this->goCategoriaDetalle = $this->CategoriaDetalleDAL->Seek($lcFiltro, $DataBaseAlias);
 
                 for ($j = 0; $j < count($this->goCategoriaDetalle) - 1 ; $j++) { // TODO: posible fallo - hacer seguimiento
@@ -481,9 +481,8 @@ class FacturaBLL
                 $this->gnId_Tipo = $this->gnGeneracionFactura;
                 $this->gnMoneda  = $this->goCategoria[0]->Moneda;
                 $lnConsumo       = $this->goGeneracionLectura[0]->ConsumoFacturado;
-                $this->gnMto_Pago = $this->goParametrosGenerales[0]->Ley1886Por * $this->l_consumo($lnConsumo, $Cliente, $DataBaseAlias); // TODO : Se le aumento $DataBaseAlias
-                // if ($this->nMoneda == 3)
-                //     $this->nMoneda = 2; 
+                $this->gnMto_Pago = - $this->goParametrosGenerales[0]->Ley1886Por * $this->l_consumo($lnConsumo, $Cliente, $DataBaseAlias); // TODO : Se le aumento $DataBaseAlias
+
                 if ($this->gnMoneda == 3) // TODO : hacer seguimiento
                     $this->gnMoneda = 2;
 
@@ -500,7 +499,6 @@ class FacturaBLL
         else
             $rtotal = $this->r_consumo($consumoLey, $Cliente, $DataBaseAlias);
 
-            // echo($rtotal);
         return round($rtotal, 2);
     }
 
