@@ -48,6 +48,31 @@ class ClienteDAL
             ->join('ACTIVIDADCLIENTE', 'CLIENTE.ActividadCliente', '=', 'ACTIVIDADCLIENTE.ActividadCliente')
             ->where('CLIENTE.Cliente', '=', $Cliente)
             ->get();
+        
+        if(count($loCliente) == 0){ // Si el resultado sale vacío, se hace una verificación del campo 'ActividadCliente' y la existencia del Cliente
+            $loCliente = $this->InsertarActividadCliente($Cliente, $DataBaseAlias);
+        }
+
+        return $loCliente;
+    }
+
+    public function InsertarActividadCliente($Cliente, $DataBaseAlias){
+        $loCliente = Cliente::on($DataBaseAlias)->findOrFail($Cliente);
+
+        if($loCliente){ // Se actualiza el campo 'ActividadCliente' con valor '1' por defecto
+            $loCliente->ActividadCliente = 1;
+            $loCliente->save();
+
+            $loCliente = Cliente::on($DataBaseAlias)
+                ->select('CLIENTE.Direccion', 'CLIENTE.Manzana', 'CLIENTE.Uv', 'CLIENTE.Lote', 'CLIENTE.Nombre',
+                            'CATEGORIA.NombreCategoria', 'ACTIVIDADCLIENTE.NombreActividadCliente')
+                ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+                ->join('ACTIVIDADCLIENTE', 'CLIENTE.ActividadCliente', '=', 'ACTIVIDADCLIENTE.ActividadCliente')
+                ->where('CLIENTE.Cliente', '=', $Cliente)
+                ->get();
+        }else {
+            $loCliente = []; // El Cliente no existe
+        }        
 
         return $loCliente;
     }

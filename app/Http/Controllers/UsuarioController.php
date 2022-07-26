@@ -39,12 +39,9 @@ class UsuarioController extends Controller
      * @param       \Illuminate\Http\Request  $request
      * @return      registro USUARIO
      */
-    public function obtenerLecturador($Usuario){
-        $loUsuario = Usuario::on('mysql')->where('Usuario', '=', $Usuario)->get();
-
-        // $loPaquete = new mPaqueteTodoFacil();
-        // $loPaquete->values = $loUsuario;
-        // return response()->json($loPaquete);
+    public function obtenerLecturador($Usuario, $DataBaseAlias){
+        $loUsuario = new UsuarioDAL;
+        $loUsuario = $loUsuario->obtenerLecturador($Usuario, $DataBaseAlias);
 
         return $loUsuario;
     }

@@ -3,6 +3,7 @@
 namespace App\DAL;
 
 use App\Models\Usuario;
+use App\Models\ParametroLectura;
 use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ class UsuarioDAL
     // 2 = Pendiente Activar
     // 3 = Pasivo
     // 4 = Baja Definitiva
-    // 5 = Usuario Prueba
+    // 5 = Administrador
 
     /**
      * Metodo que devuelve un objeto con el USUARIO registrado
@@ -119,5 +120,16 @@ class UsuarioDAL
             DB::rollback();
             return $e->getMessage();
         }
+    }
+
+    public function obtenerLecturador($Usuario, $DataBaseAlias){
+        $parametroLectura = ParametroLectura::on($DataBaseAlias)->get();
+
+        if($parametroLectura[0]->ImprimirLecturador == 1)
+            $loUsuario = Usuario::on('mysql')->where('Usuario', '=', $Usuario)->get();
+        else
+            $loUsuario = '';
+            
+        return $loUsuario;
     }
 }
