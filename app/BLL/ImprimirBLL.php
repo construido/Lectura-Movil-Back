@@ -154,7 +154,11 @@ class ImprimirBLL
         $loMensaje = new MensajeClienteDAL;
         $loMensaje = $loMensaje->GetMensajes($Cliente, $Cobro, $DataBaseAlias);
 
-        $mensajePrueba = $loMensaje[0]->Linea1 .' '. $loMensaje[0]->Linea2 .' '. $loMensaje[0]->Linea3 .' '. $loMensaje[0]->Linea4 .' '. $loMensaje[0]->Linea5;
+        if(count($loMensaje) != 0){
+            $mensajePrueba = $loMensaje[0]->Linea1 .' '. $loMensaje[0]->Linea2 .' '. $loMensaje[0]->Linea3 .' '. $loMensaje[0]->Linea4 .' '. $loMensaje[0]->Linea5;
+        }else{
+            $mensajePrueba = '';
+        }
 
             // table td {
             //     border:1px solid black; 
