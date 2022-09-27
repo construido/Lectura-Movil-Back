@@ -138,8 +138,9 @@ class ImprimirBLL
         $DeudaAtrasada = $TotalDeuda;
         $TotalDeuda = $TotalDeuda + $laFacturaCliente[0]->MontoTotal;
 
+        $mes = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"][date("n") - 1];
         $timestamp = strtotime($Cobro);
-        $newDate = date("m/Y", $timestamp);
+        $newDate = $mes.'-'.date("Y", $timestamp); // date("m/Y", $timestamp);
 
         if (isset($FechaAnterior[0]->FechaLectura)) {
             $timestamp2 = strtotime($FechaAnterior[0]->FechaLectura);
