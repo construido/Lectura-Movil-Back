@@ -80,7 +80,7 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
-        ], //mysql_LMCosepW
+        ],
         'mysql_LMCosepW' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL_3'),
@@ -89,6 +89,25 @@ return [
             'database' => env('DB_DATABASE_3', 'forge'),
             'username' => env('DB_USERNAME_3', 'forge'),
             'password' => env('DB_PASSWORD_3', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false, // Se cambio a false para que las consultas de MySQL no sean strictas - salía error al usar groupBy
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+        'mysql_LMCosphul' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL_4'),
+            'host' => env('DB_HOST_4', '127.0.0.1'),
+            'port' => env('DB_PORT_4', '3306'),
+            'database' => env('DB_DATABASE_4', 'forge'),
+            'username' => env('DB_USERNAME_4', 'forge'),
+            'password' => env('DB_PASSWORD_4', ''),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
