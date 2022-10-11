@@ -58,4 +58,14 @@ class MedidorAnormalidadDAL
         
         return $loMedidorAnormalidad;
     }
+
+    public function obtenerMensajeAnormalidad($MedidorAnormalidad, $DataBaseAlias){
+        $loMedidorAnormalidad = MedidorAnormalidad::on($DataBaseAlias)
+            ->select('EtiquetaAdvertencia')
+            ->where('MedidorAnormalidad', '=', $MedidorAnormalidad)
+            ->where('ImprimirEtiquetaAdvertencia', '=', 1)
+            ->get();
+        
+        return $loMedidorAnormalidad;
+    }
 }

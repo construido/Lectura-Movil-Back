@@ -33,16 +33,3 @@ class HistoricoFacturaDAL
     return $loHistoricoFactura;
     }
 }
-
-// select FechaLectura
-// FROM syscoopc_LecturaMovil.HISTORICOFACTURA
-// where Cliente = 4780
-// order by Factura desc
-// limit 1;
-
-
-// SELECT Cobro as Mes, NumeroFactura as Factura, Consumo as M3, Monto as MontoFactura, FechaLectura, MedidorAnormalidad,
-// 	CASE WHEN (FacturaPago = '00/00/000') THEN '  /  /    ' ELSE FacturaPago END as FechaPago,
-//     CASE WHEN (Estado = 1) THEN 'Impaga' ELSE 'Pagado' END as Estado
-// FROM syscoopc_LecturaMovil.HISTORICOFACTURA
-// WHERE Cliente = 4780;

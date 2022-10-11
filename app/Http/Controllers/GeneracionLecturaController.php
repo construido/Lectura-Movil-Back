@@ -423,6 +423,7 @@ class GeneracionLecturaController extends Controller
         $loPaquete              = new mPaqueteTodoFacil();
         $loGeneracionLectura    = [];
 
+        $laGeneracionLectura['tcMedidorAnormalidad2'] = $request->input('tnMedidorAnormalidad2');
         $laGeneracionLectura['tcMedidorAnormalidad'] = $request->input('tnMedidorAnormalidad');
         $laGeneracionLectura['tcGeneracionLectura']  = $request->input('tnGeneracionFactura');
         $laGeneracionLectura['tcLecturaAnterior']    = $request->input('tnLecturaAnterior');
