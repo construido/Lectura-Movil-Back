@@ -168,16 +168,20 @@ class GeneracionLecturaController extends Controller
                 ->select((DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,1,2) as Zona')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,3,2) as Ruta')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,5,5) as CodigoUbicacion')),
-                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro',
+                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2',// TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
                     'GENERACIONLECTURA.Cliente', 'GENERACIONLECTURA.LecturaAnterior', 'GENERACIONLECTURA.GeneracionFactura', 'GENERACIONLECTURA.ConsumoFacturado', 'TIPOCONSUMO.Nombre as NombreTC',
                     'CLIENTE.Nombre', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'GENERACIONLECTURA.LecturaActual', 'GENERACIONLECTURA.Consumo', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
                     (DB::raw('floor(GENERACIONLECTURA.Media) as Media')))
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
                 ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor')
                 ->leftJoin('MARCAMEDIDOR', 'MEDIDOR.MarcaMedidor', '=', 'MARCAMEDIDOR.MarcaMedidor')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
                 ->where('CLIENTE.Nombre', 'like', '%'.$lnBuscar.'%')
                 ->where(function($query){
                     $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')
@@ -193,16 +197,20 @@ class GeneracionLecturaController extends Controller
                 ->select((DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,1,2) as Zona')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,3,2) as Ruta')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,5,5) as CodigoUbicacion')),
-                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro',
+                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2',// TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
                     'GENERACIONLECTURA.Cliente', 'GENERACIONLECTURA.LecturaAnterior', 'GENERACIONLECTURA.GeneracionFactura', 'GENERACIONLECTURA.ConsumoFacturado', 'TIPOCONSUMO.Nombre as NombreTC',
                     'CLIENTE.Nombre', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'GENERACIONLECTURA.LecturaActual', 'GENERACIONLECTURA.Consumo', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
                     (DB::raw('floor(GENERACIONLECTURA.Media) as Media')))
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
                 ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor')
                 ->leftJoin('MARCAMEDIDOR', 'MEDIDOR.MarcaMedidor', '=', 'MARCAMEDIDOR.MarcaMedidor')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
                 ->where('GENERACIONLECTURA.Cliente', '=', $lnBuscar)
                 ->where(function($query){
                     $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')
@@ -218,16 +226,20 @@ class GeneracionLecturaController extends Controller
                 ->select((DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,1,2) as Zona')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,3,2) as Ruta')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,5,5) as CodigoUbicacion')),
-                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro',
+                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2',// TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
                     'GENERACIONLECTURA.Cliente', 'GENERACIONLECTURA.LecturaAnterior', 'GENERACIONLECTURA.GeneracionFactura', 'GENERACIONLECTURA.ConsumoFacturado', 'TIPOCONSUMO.Nombre as NombreTC',
                     'CLIENTE.Nombre', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'GENERACIONLECTURA.LecturaActual', 'GENERACIONLECTURA.Consumo', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
                     (DB::raw('floor(GENERACIONLECTURA.Media) as Media')))
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
                 ->leftJoin('MEDIDOR', 'GENERACIONLECTURA.Medidor', '=', 'MEDIDOR.Medidor')
                 ->leftJoin('MARCAMEDIDOR', 'MEDIDOR.MarcaMedidor', '=', 'MARCAMEDIDOR.MarcaMedidor')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
                 ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '____'.$lnBuscar.'%')
                 ->where(function($query){
                     $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')
@@ -243,15 +255,19 @@ class GeneracionLecturaController extends Controller
                 ->select((DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,1,2) as Zona')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,3,2) as Ruta')),
                     (DB::raw('substr(GENERACIONLECTURA.CodigoUbicacion,5,5) as CodigoUbicacion')),
-                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro',
+                    'MARCAMEDIDOR.NombreMarcaMedidor', 'GENERACIONLECTURA.CodigoUbicacion as CodUbi', 'GENERACIONLECTURA.Cobro', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2',// TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
                     'GENERACIONLECTURA.Cliente', 'GENERACIONLECTURA.LecturaAnterior', 'GENERACIONLECTURA.GeneracionFactura', 'GENERACIONLECTURA.ConsumoFacturado', 'TIPOCONSUMO.Nombre as NombreTC',
                     'CLIENTE.Nombre', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'GENERACIONLECTURA.LecturaActual', 'GENERACIONLECTURA.Consumo', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
                     (DB::raw('floor(GENERACIONLECTURA.Media) as Media')))
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
                 ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor')
                 ->leftJoin('MARCAMEDIDOR', 'MEDIDOR.MarcaMedidor', '=', 'MARCAMEDIDOR.MarcaMedidor')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                 ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '%'.$lnBuscar.'%')
                 ->where(function($query){
@@ -296,11 +312,15 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC')
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+        ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+        ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
         ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
         ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-        ->where('GeneracionFactura', '=', $lnGeneracionFactura)
+        ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
+        ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
         ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
         ->get();
 
@@ -359,11 +379,15 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC')
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+        ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+        ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
         ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
         ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-        ->where('GeneracionFactura', '=', $lnGeneracionFactura)
+        ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+        ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
         ->where(function($query){
             $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')
             ->orWhere('GENERACIONLECTURA.Consumo', '>', '0')
@@ -446,10 +470,12 @@ class GeneracionLecturaController extends Controller
             $LecturaActual = $lnConsumo;
             $Consumo       = $lnConsumo;
             $lnMedidorAnormalidad = 0;
+            $lnMedidorAnormalidad2 = 0; // TODO : implementacion de la variable para la segunda anormalidad
             $lnTipoConsumo = 1;
 
             GeneracionLecturaDAL::ActualizarLecturaSinMedidorDAL($request->tnGeneracionFactura, $request->tnCliente, $LecturaActual, $Consumo, $lnMedidorAnormalidad, $request->DataBaseAlias);
-            $loGeneracionLecturaBLL->ActualizarLecturaMovilSinMedidor($request->tnGeneracionFactura, $request->tnCliente, $request->tnCategoria, $lnTipoConsumo, $lnMedidorAnormalidad, $request->DataBaseAlias);
+            $loGeneracionLecturaBLL->ActualizarLecturaMovilSinMedidor($request->tnGeneracionFactura, $request->tnCliente, $request->tnCategoria,
+                        $lnTipoConsumo, /*$lnMedidorAnormalidad*/ $lnMedidorAnormalidad2, $request->DataBaseAlias);
             $loGeneracionLectura['Error'] = 2000;
         }else{
             $loGeneracionLectura = $loGeneracionLecturaBLL->ModificarYValidarLectura($laGeneracionLectura);
