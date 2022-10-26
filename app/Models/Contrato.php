@@ -11,7 +11,7 @@ class Contrato extends Model
 
     protected $table        = 'CONTRATO';
     protected $primaryKey   = 'Contrato';
-    protected $fillable     = ['Empresa', 'Usuario', 'Lecturador', 'FechaContrato', 'FechaLimite', 'Estado'];
+    protected $fillable     = ['Empresa', 'Usuario', 'Lecturador', 'Plomero', 'FechaContrato', 'FechaLimite', 'Estado', 'LoginEmpresa', 'PasswordEmpresa'];
                                
     public $timestamps      = false;
 }

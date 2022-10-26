@@ -54,8 +54,10 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/AnormalidadesDeMedidor', [MedidorAnormalidadController::class, 'AnormalidadesDeMedidor']);
 
     // RUTAS PARA EL ENVIO DE DATOS A LA DB´s DE LAS EMPRESAS
-    // Route::post('/verificarConexionRestNET', [LecturaMovilController::class,'verificarConexionRestNET']);
-    // Route::post('/guardarLecturaNubeToEmpresa', [LecturaMovilController::class,'guardarLecturaNubeToEmpresa']);
+    Route::post('/WMSincronizacionBDListDemo', [LecturaMovilController::class,'WMSincronizacionBDListDemo']);
+    Route::post('/WMGet_Lecturas_Pendientes', [LecturaMovilController::class,'WMGet_Lecturas_Pendientes']);
+    Route::post('/verificarConexionRestNET', [LecturaMovilController::class,'verificarConexionRestNET']);
+    Route::post('/WMAutenticar', [LecturaMovilController::class,'WMAutenticar']);
 
     // RUTAS PARA LA IMPRESIÓN DE LA FACTURA
     Route::post('/CrearFactura', [FacturaController::class,'CrearFactura']);

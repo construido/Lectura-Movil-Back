@@ -4,20 +4,26 @@ namespace App\Http\Controllers;
 
 use App\BLL\LecturaMovilRestNET;
 use Illuminate\Http\Request;
+use Storage;
 
 class LecturaMovilController extends Controller
 {
-    public function verificarConexionRestNET(Request $request)
-    {
+    public function WMAutenticar(Request $request){
         $loLMRestNET = new LecturaMovilRestNET(6);
-        $loContents = $loLMRestNET->verificarConexionRestNET($request);
-        return response()->json($loContents);
+        $loContents = $loLMRestNET->WMAutenticar($request->login, $request->password);
+        return $loContents;
     }
 
-    public function guardarLecturaNubeToEmpresa(Request $request)
-    {
+    public function WMGet_Lecturas_Pendientes(){
         $loLMRestNET = new LecturaMovilRestNET(6);
-        $loContents = $loLMRestNET->guardarLecturaNubeToEmpresa($request);
-        return response()->json($loContents);
+        $loContents = $loLMRestNET->WMGet_Lecturas_Pendientes();
+        $loContents = $loContents['diffgrdiffgram']['NewDataSet']['Table'];
+        return $loContents;
+    }
+
+    public function WMSincronizacionBDListDemo(Request $request){
+        $loLMRestNET = new LecturaMovilRestNET(6);
+        $loContents = $loLMRestNET->WMSincronizacionBDListDemo($request);
+        return $loContents;
     }
 }
