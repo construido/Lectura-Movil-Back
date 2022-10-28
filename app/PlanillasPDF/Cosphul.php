@@ -91,8 +91,8 @@ class Cosphul //ImprimirBLL
                 $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 20px;">'.($laFacturaCliente[0]->Estado == 1 ? "Pendiente" : "Pagado").'</td>';
                 
                 if ($i < $contar) {
-                    $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 15px; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.' </td>';
-                    $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 40px;"> '.$laFacturaDetalle[$i]->MontoPago.' </td> </tr>';
+                    $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 20px; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.' </td>';
+                    $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 53px;"> '.$laFacturaDetalle[$i]->MontoPago.' </td> </tr>';
     
                     $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                 }else{
@@ -118,8 +118,8 @@ class Cosphul //ImprimirBLL
                     $Indice = $Indice + 1;
 
                     if ($i < $contar) {
-                        $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 15px; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.'</td>';
-                        $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 40px;">'.$laFacturaDetalle[$i]->MontoPago.'</td> </tr>';
+                        $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 20px; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.'</td>';
+                        $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 55px;">'.$laFacturaDetalle[$i]->MontoPago.'</td> </tr>';
                         $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                     }else{
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
@@ -133,8 +133,8 @@ class Cosphul //ImprimirBLL
                     $Indice = $Indice + 1;
 
                     if ($i < $contar) {
-                        $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.'</td>';
-                        $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 30px;">'.$laFacturaDetalle[$i]->MontoPago.'</td> </tr>';
+                        $Historial = $Historial . '<td align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 20px; padding-right: 0; font-size: 13px;">'.$laFacturaDetalle[$i]->NombreServicio.'</td>';
+                        $Historial = $Historial . '<td align="right" style="padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 55px;">'.$laFacturaDetalle[$i]->MontoPago.'</td> </tr>';
                         $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                     }else{
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
@@ -263,8 +263,8 @@ class Cosphul //ImprimirBLL
                         <td colspan="1" align="right">'. date('d/m/Y') .'</td>
                         <td align="right" style="padding: 0;">'. $Lectura_Actual .'</td>
                         <td rowspan="2" colspan="1" align="right" style="padding: 0; font-size: 30px;">'. $Consumo .'</td>
-                        <td rowspan="2" align="right" style="font-size: 30px;">'.$laFacturaCliente[0]->MedidorAnormalidad.'</td>
-                        <td rowspan="2" colspan="1" align="center" style="font-size: 30px;">'.($contador->format($differenceFormat)).'</td>
+                        <td rowspan="2" align="right" style="font-size: 30px; padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 20px;">'.$laFacturaCliente[0]->MedidorAnormalidad.'</td>
+                        <td rowspan="2" colspan="1" align="left" style="font-size: 30px; padding-top: 0; padding-bottom: 0;  padding-left: 70px; padding-right: 0;">'.($contador->format($differenceFormat)).'</td>
                         <td rowspan="2" colspan="1" align="center" style="font-size: 30px;">'. $DeudaAtrasada .'</td>
                         <td rowspan="2" colspan="2" align="center" style="font-size: 30px;">'. $NumeroMeses .'</td>
                         <td colspan="2" align="right" style="padding-right: 75px;">'. (empty($FechaCorte) ? "" : "SÍ") .'</td>
@@ -305,7 +305,7 @@ class Cosphul //ImprimirBLL
         
         ';
         
-        $customPaper = array(0, 0, 289.13, 596.20);
+        $customPaper = array(0, 0, 289.13, 599.15); //596.20
         $pdf = PDF::loadHTML($array)
             ->setPaper($customPaper, 'landscape')
             ->setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);

@@ -21,11 +21,19 @@ class ImprimirBLL
                         $Consumo, $Cobro, $GeneracionFactura, $DataBaseAlias, $EmpresaNombre);
                 break;
             case 1:
+                /*$pdf = $pdfCosphul->GetFacturaCosphul($Cliente, $CodigoUbicacion, $Lectura_Actual, $Lectura_Anterior,
+                        $Consumo, $Cobro, $GeneracionFactura, $DataBaseAlias, $EmpresaNombre);*/
+                break;
+            case 2:
                 $pdf = $pdfCosphul->GetFacturaCosphul($Cliente, $CodigoUbicacion, $Lectura_Actual, $Lectura_Anterior,
                         $Consumo, $Cobro, $GeneracionFactura, $DataBaseAlias, $EmpresaNombre);
                 break;
+            default:
+                $pdf = $pdfCosepW->GetFacturaCosepW($Cliente, $CodigoUbicacion, $Lectura_Actual, $Lectura_Anterior,
+                        $Consumo, $Cobro, $GeneracionFactura, $DataBaseAlias, $EmpresaNombre);
+                break;
         }
-
+        
         return $pdf;
     }
 }

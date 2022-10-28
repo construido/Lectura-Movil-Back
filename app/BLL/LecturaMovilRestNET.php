@@ -57,6 +57,7 @@ class LecturaMovilRestNET
     }
 
     public function WMSincronizacionBDListDemo($request){
+        set_time_limit(120);
         $lcURL = $this->cURLBase . "/WMSincronizacionBDListDemo?tcLogin=".$this->cEmpresa[0]->LoginEmpresa
                 ."&tcPassword=".$this->cEmpresa[0]->PasswordEmpresa
                 ."&tcAccesUser=".$this->loUserAccess
@@ -68,10 +69,12 @@ class LecturaMovilRestNET
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus = $loResponse->getStatusCode();
 
-        if ($lnStatus == 200) $array = 'Success satisfaction...';
+        $lnStatus = ($lnStatus == 200) ? 1 : 0;
+        return $lnStatus;
+
+        /*if ($lnStatus == 200) $array = 'Success satisfaction...';
         else $array = $lnStatus;
-        
-        return $array;
+        return $array;*/
     }
 
     /*public function verificarConexionRestNET($request)
