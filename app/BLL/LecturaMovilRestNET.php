@@ -18,6 +18,7 @@ class LecturaMovilRestNET
     {
         //$tnEmpresa es la empresa ID el cual cuando se logea el Lecturador debe manda cada vez que use esta clase para sacar de la DB el IP de la emprea 
         //al cual vamos a acceder para leer y guardar...
+        set_time_limit(240);
         $this->loClient = new Client();
         $this->cEmpresa = $this->datosEmpresa(); //"201.222.126.62";
         $this->cURLBase = "http://" . $this->cEmpresa[0]->ServerIP . $this->cEndPointBase;
@@ -57,7 +58,6 @@ class LecturaMovilRestNET
     }
 
     public function WMSincronizacionBDListDemo($request){
-        set_time_limit(120);
         $lcURL = $this->cURLBase . "/WMSincronizacionBDListDemo?tcLogin=".$this->cEmpresa[0]->LoginEmpresa
                 ."&tcPassword=".$this->cEmpresa[0]->PasswordEmpresa
                 ."&tcAccesUser=".$this->loUserAccess
@@ -71,10 +71,6 @@ class LecturaMovilRestNET
 
         $lnStatus = ($lnStatus == 200) ? 1 : 0;
         return $lnStatus;
-
-        /*if ($lnStatus == 200) $array = 'Success satisfaction...';
-        else $array = $lnStatus;
-        return $array;*/
     }
 
     /*public function verificarConexionRestNET($request)
