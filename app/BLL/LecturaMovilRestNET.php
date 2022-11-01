@@ -21,8 +21,8 @@ class LecturaMovilRestNET
         set_time_limit(240);
         $this->loClient = new Client();
         $this->cEmpresa = $this->datosEmpresa(); //"201.222.126.62";
-        $this->cURLBase = "http://" . $this->cEmpresa[0]->ServerIP . $this->cEndPointBase;
-        $this->loUserAccess = $this->WMAutenticar($this->cEmpresa[0]->LoginEmpresa, $this->cEmpresa[0]->PasswordEmpresa);
+        $this->cURLBase = "http://" . trim($this->cEmpresa[0]->ServerIP) . trim($this->cEndPointBase);
+        $this->loUserAccess = $this->WMAutenticar(trim($this->cEmpresa[0]->LoginEmpresa), trim($this->cEmpresa[0]->PasswordEmpresa));
     }
 
     public function datosEmpresa(){
@@ -40,6 +40,10 @@ class LecturaMovilRestNET
     }
 
     public function WMAutenticar($login, $password){
+        /*$this->cEmpresa = $this->datosEmpresa();
+        $this->cURLBase = "http://" . $this->cEmpresa[0]->ServerIP . $this->cEndPointBase;
+        $lcURL      = $this->cURLBase . "/WMAutenticar?login=".$this->cEmpresa[0]->LoginEmpresa."&password=".$this->cEmpresa[0]->PasswordEmpresa;*/
+        //echo $login . $password;
         $lcURL      = $this->cURLBase . "/WMAutenticar?login=".$login."&password=".$password;
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus   = $loResponse->getStatusCode();
@@ -50,7 +54,10 @@ class LecturaMovilRestNET
     }
 
     public function WMGet_Lecturas_Pendientes(){
-        $lcURL      = $this->cURLBase . "/WMGet_Lecturas_Pendientes?useraccess=".$this->loUserAccess."&id_plomero=".$this->cEmpresa[0]->Plomero;
+        /*$this->loUserAccess = $this->WMAutenticar('', '');
+        $lcURL      = $this->cURLBase . "/WMGet_Lecturas_Pendientes?useraccess=".$this->loUserAccess."&id_plomero=".$this->cEmpresa[0]->Plomero;*/
+        $urlEncode = urlencode($this->loUserAccess);
+        $lcURL      = $this->cURLBase . "/WMGet_Lecturas_Pendientes?useraccess=".$urlEncode."&id_plomero=".$this->cEmpresa[0]->Plomero;
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus   = $loResponse->getStatusCode();
         $loContents = $loResponse->getBody()->getContents();
