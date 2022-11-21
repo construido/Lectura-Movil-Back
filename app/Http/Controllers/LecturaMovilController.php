@@ -33,4 +33,11 @@ class LecturaMovilController extends Controller
         $loPaquete->values  = $loContents == 1 ? 'Sincronizacion Correcta...' : 'Error al Sincronizar...';
         return response()->json($loPaquete);
     }
+
+    public function WMSincronizarCaS(Request $request){
+        $loLMRestNET = new LecturaMovilRestNET(6);
+        $loLMRestNET = $loLMRestNET->WMSincronizarCaS($request);
+
+        return $loLMRestNET;
+    }
 }

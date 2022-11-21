@@ -82,10 +82,11 @@ class GeneracionLecturaDAL
         return $loGeneracionLectura;
     }
 
-    public function actualizarLecturaDAL($TipoReglaAplicar, $gnGeneracionFactura, $gnCliente, $gnLecturaActual, $gnConsumoActual, $gnMedidorAnormalidad, $DataBaseAlias, $validar){
+    public function actualizarLecturaDAL($TipoReglaAplicar, $gnGeneracionFactura, $gnCliente, $gnLecturaActual, $gnConsumoActual, $gnMedidorAnormalidad, $DataBaseAlias, $validar, $ConsumoFacturado){
         $gnLecturaActual    = $gnLecturaActual == null ? 0 : $gnLecturaActual; // TODO - hacer seguimiento para LecturaActual, ConsumoFacturado y ConsumoActual:no debe guardar valor negativo
         $gnConsumoActual    = $gnConsumoActual < 0 ? 0 : $gnConsumoActual;
-        $lnConsumoFacturado = $validar == true ? $gnConsumoActual : 0;
+        //$lnConsumoFacturado = $validar == true ? $gnConsumoActual : 0;
+        $lnConsumoFacturado = $ConsumoFacturado;
             
         switch ($TipoReglaAplicar) {
             case 0: // Aplicar Cosumo Normal sin Anormalidad

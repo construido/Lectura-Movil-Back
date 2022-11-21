@@ -20,6 +20,7 @@
     use App\Modelos\TipoComportamiento;
 
     use App\Models\CategoriaConsumo;
+    use Illuminate\Support\Facades\Storage;
 
     // La primera indica el tipo de variable
     // •	l - Local
@@ -56,6 +57,7 @@ class GeneracionLecturaBLL{
             try {
                 $lnResult = 0;
                 $this->nError = 0;
+                $lnConsumoMinimo = 0;
                 $this->nErrorAdvertencia = 0;
                 $this->gnMedidorAnormalidad2 = $datos['tcMedidorAnormalidad2']; // TODO : se inicializa la variable - $gnMedidorAnormalidad2
                 
@@ -70,9 +72,14 @@ class GeneracionLecturaBLL{
                     return $this->ResultadoModificacionLecturaCliente();
                 }
 
+                // TODO : obtener la categoria del cliente y obtener el consumo minimo de la tabla categoria $datos['tcCategoria']
+                // enviar el consumo minimo como parametro $lnConsumoMinimo
+                $CategoriaDAL    = new CategoriaDAL;
+                $lnConsumoMinimo = $CategoriaDAL->GetConsumoMinimo($datos['tcCategoria'], $datos['DataBaseAlias']);
+
                 // 2.- VALIDAR LECTURAS Y CONSUMO
                 $lnResult = $this->ValidarLectura($datos['tcCliente'], $datos['tcGeneracionLectura'], 
-                    $datos['tcLecturaActual'], $Consumo, $datos['tcMedidorAnormalidad'], $datos['tcMedia']);
+                    $datos['tcLecturaActual'], $Consumo, $datos['tcMedidorAnormalidad'], $datos['tcMedia'], $lnConsumoMinimo);
 
                 $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria']);
 
@@ -131,6 +138,8 @@ class GeneracionLecturaBLL{
                 $this->ValidoLectura           = false;
 
                 $this->DataBaseAlias           = $DataBaseAlias;
+                $texto["ConsumoActual"] = "ConsumoActual".$this->gnConsumoActual;
+                Storage::disk('local')->put('Error/error_CA_.txt', $texto);
 
                 return 0;
             } catch (\Exception $th) {
@@ -139,7 +148,7 @@ class GeneracionLecturaBLL{
         }
 
         public function ValidarLectura($tcCliente, $tcGeneracionLectura, 
-                $tcLecturaActual, $Consumo, $tcMedidorAnormalidad, $tcMedia){
+                $tcLecturaActual, $Consumo, $tcMedidorAnormalidad, $tcMedia, $tnConsumoMinimo){
             $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
             $GeneracionLecturaDAL = new GeneracionLecturaDAL;
             $lnLecturaAnteriorDAL = $GeneracionLecturaDAL->GetRecDt2($tcGeneracionLectura, $tcCliente, $this->DataBaseAlias);
@@ -236,9 +245,56 @@ class GeneracionLecturaBLL{
                     }
                 }
             }else {
-                $lnResult = $this->AnormalidadCorrecta($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->MedidorInfo->MedidorTipoComportamiento);
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+                $lnResult = $this->EsCasoSinLectura_AplicarPromedio($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->gnLecturaAnterior, 
+                    $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnConsumoFacturado, $tnConsumoMinimo); // TODO
+                    
+                if($lnResult == 3 || $lnResult == 2){
+                    $lnResult = $this->AnormalidadCorrecta($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->MedidorInfo->MedidorTipoComportamiento);
+                }
             }
 
+            return $lnResult;
+        }
+
+        public function EsCasoSinLectura_AplicarPromedio($tnMedidorAnormalidad, $tnTipoConsumo, $tnLecturaAnterior, $tnLecturaActual, $tnConsumoActual, $tnMedia, $tnConsumoFacturado, $tnConsumoMinimo){
+
+            $lcSQL;
+            $lnArea;
+            $lnResult = 3;
+            $lnMessageError;
+            $lnTipoConsumoSistema;
+
+            $lnMedidorAnormalidad = new MedidorAnormalidadDAL;
+            $lnMedidorAnormalidad = $lnMedidorAnormalidad->EsCasoSinLectura($tnMedidorAnormalidad, $this->DataBaseAlias);
+
+            if(count($lnMedidorAnormalidad) > 0){
+                //$this->Regla = $lnMedidorAnormalidad[0]->Regla;
+                $lnRegla = $lnMedidorAnormalidad[0]->Regla;
+                $lnTipoConsumoSistema = $lnMedidorAnormalidad[0]->TipoConsumo;
+
+                if(($tnLecturaActual == $tnLecturaAnterior) && ($tnConsumoActual == 0)){
+                    if(($lnTipoConsumoSistema == $this->TipoConsumo->SinLectura) && ($lnRegla == $this->ReglaLecturacion->CONSUMO_PROMEDIO)){
+                        if(($tnConsumoMinimo > 0) && ($tnConsumoFacturado <= $tnConsumoMinimo) && ($tnMedia <= $tnConsumoMinimo)){
+                            $lnResult = 0;
+                        }else if($lnConsumoFacturado <> $tnMedia){
+                            $lnResult = 4;
+                            $lnMessageError = "ConsumoFacturado Inválido";
+                        }else{
+                            $lnResult = 0;
+                        }
+                    }else{
+                        $lnResult = 2;
+                        $lnMessageError = "TipoConsumo no Compatible con la Anormalidad";
+                    }
+                }else{
+                    $lnResult = 2;
+                    $lnMessageError = "TipoConsumo no Compatible con la Anormalidad";
+                }
+            }else{
+                $lnResult = 3;
+                $lnMessageError = "No Existe Anormalidad";
+            }
             return $lnResult;
         }
 
@@ -250,6 +306,8 @@ class GeneracionLecturaBLL{
             $loMedidorAnormalidad = $MedidorAnormalidad->GetRecDt($tnMedidorAnormalidad, $this->DataBaseAlias);
     
             if (count($loMedidorAnormalidad) > 0) { // TODO && (dtMediEsta.Select(filtro).Length > 0)
+
+
                 $this->Regla = $loMedidorAnormalidad[0]->Regla;
     
                 if ($tnTipoComportamiento == $this->TipoComportamiento->FinDeCiclo) {
@@ -640,12 +698,19 @@ class GeneracionLecturaBLL{
             return 0;
         }
 
+        public function verificarConsumoFacturado(){
+            if(($this->gnConsumoMinimo > 0) && (/*$this->gnConsumoFacturado*/$this->gnConsumoActual < $this->gnConsumoMinimo)){
+                $this->gnConsumoFacturado = $this->gnConsumoMinimo;
+            }else{
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+            }
+        }
+
         public function AplicarRegla($llSeValida){
-            // $TipoConsumo = new TipoConsumo;
             $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
+            $this->verificarConsumoFacturado();
 
             $lnResult = 0;
-            // $TipoReglaAplicar = $MedidorAnormalidadDAL->Get_TipoReglaAAplicar($this->gnMedidorAnormalidad);
             $TipoReglaAplicar = $MedidorAnormalidadDAL->Get_TipoReglaAAplicar($this->gnMedidorAnormalidad, $this->DataBaseAlias);
             if ($llSeValida == false) {
                 $lnResult = $this->Aplicar_LecturaActual();
@@ -677,13 +742,15 @@ class GeneracionLecturaBLL{
                 
                 $this->ValidoLectura = true;
                 $TipoReglaAplicar = $MedidorAnormalidadDAL->Aplicar_LecturaActual;
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                // TODO : verificar que el consumo facturado sea menor al minimo debe guardar con el consumo minino Categoria.ConsumoMinimo
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO: $this->gnConsumoFacturado
 
                 // Campos para la table GeneracionLecturaMovil
                 $this->AplicarPromedio   = false;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = 0;
+                $this->gnConsumoFacturado = 0; // TODO : guardar segun calculo
                 $this->DesviacionSignificativa = (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoBajo) || ($this->gnTipoConsumo == $this->TipoConsumo->ConsumoAlto));
                 $MedidorAnormalidad = $MedidorAnormalidadDAL->GetRecDt($this->gnMedidorAnormalidad, $this->DataBaseAlias);
                 $this->InspeccionRequerido = $MedidorAnormalidad[0]->Inspeccion;
@@ -716,7 +783,8 @@ class GeneracionLecturaBLL{
     
                 $TipoReglaAplicar = $MedidorAnormalidad->Aplicar_ConsumoNormal;
                 $this->ValidoLectura = true;
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO:  $this->gnConsumoFacturado
     
                 // Campos para la tabla GeneracionLecturaMovil
                 $this->AplicarPromedio   = false;
@@ -756,7 +824,8 @@ class GeneracionLecturaBLL{
                 $TipoReglaAplicar = $MedidorAnormalidad->Aplicar_LecturaPendiente;
                 $this->gnLecturaActual = 0; // llevar seguimiento
                 $this->gnConsumoActual = 0; // llevar seguimiento
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO: $this->gnConsumoFacturado
     
                 $existe = $GeneracionLecturaMovilDAL->Existe($this->gnGeneracionFactura, $this->gnCliente, $this->DataBaseAlias);
                 if (count($existe) > 0) {
@@ -787,7 +856,8 @@ class GeneracionLecturaBLL{
                 $TipoReglaAplicar = $MedidorAnormalidadDAL->Aplicar_FinDeCiclo;
                 $this->gnTipoConsumo = $this->CalcularConsumoXFinDeCiclo($this->gnCliente, $this->gnGeneracionFactura, $this->gnLecturaActual);
                 $this->ValidoLectura = true;
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO: $this->gnConsumoFacturado
     
                 // Campos para la table GeneracionLecturaMovil
                 $this->AplicarPromedio   = false;
@@ -831,7 +901,8 @@ class GeneracionLecturaBLL{
     
                 $TipoReglaAplicar = $MedidorAnormalidadDAL->Aplicar_ConsumoPromedio;
                 $this->ValidoLectura = false;
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO: $this->gnConsumoFacturado
     
                 // Campos para la table GeneracionLecturaMovil
                 $this->AplicarPromedio   = true;
@@ -872,7 +943,8 @@ class GeneracionLecturaBLL{
     
                 $this->gnTipoConsumo = $this->CalcularConsumoXMedidorVolcado($this->gnCliente, $this->gnGeneracionFactura, $this->gnLecturaActual);
                 $this->ValidoLectura = true;
-                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura);
+                $GeneracionLecturaDAL->actualizarLecturaDAL($TipoReglaAplicar, $this->gnGeneracionFactura, $this->gnCliente, $this->gnLecturaActual, 
+                    $this->gnConsumoActual, $this->gnMedidorAnormalidad, $this->DataBaseAlias, $this->ValidoLectura, $this->gnConsumoFacturado); // TODO: $this->gnConsumoFacturado
     
                 // Campos para la table GeneracionLecturaMovil
                 $this->AplicarPromedio   = false;

@@ -57,6 +57,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/WMSincronizacionBDListDemo', [LecturaMovilController::class,'WMSincronizacionBDListDemo']);
     Route::post('/WMGet_Lecturas_Pendientes', [LecturaMovilController::class,'WMGet_Lecturas_Pendientes']);
     Route::post('/verificarConexionRestNET', [LecturaMovilController::class,'verificarConexionRestNET']);
+    Route::post('/WMSincronizarCaS', [LecturaMovilController::class,'WMSincronizarCaS']);
     Route::post('/WMAutenticar', [LecturaMovilController::class,'WMAutenticar']);
 
     // RUTAS PARA LA IMPRESIÓN DE LA FACTURA
@@ -69,3 +70,5 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
 // ip de la maquina = 192.168.100.84
 // ejecutar para que funcione en celular
 // tymon/config/config.php TODO - para cambiar el tiempo que dure activo el token de session
+
+Route::post('/WMSincronizarCaS', [LecturaMovilController::class,'WMSincronizarCaS']);

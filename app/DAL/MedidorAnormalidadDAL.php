@@ -68,4 +68,13 @@ class MedidorAnormalidadDAL
         
         return $loMedidorAnormalidad;
     }
+
+    public function EsCasoSinLectura($MedidorAnormalidad, $DataBaseAlias){
+        $loMedidorAnormalidad = MedidorAnormalidad::on($DataBaseAlias)
+        ->select('MedidorAnormalidad', 'TipoConsumo', 'Regla')
+        ->where('MedidorAnormalidad', '=', $MedidorAnormalidad)
+        ->get();
+    
+        return $loMedidorAnormalidad;
+    }
 }
