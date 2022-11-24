@@ -269,12 +269,12 @@ class GeneracionLecturaBLL{
             $lnMedidorAnormalidad = $lnMedidorAnormalidad->EsCasoSinLectura($tnMedidorAnormalidad, $this->DataBaseAlias);
 
             if(count($lnMedidorAnormalidad) > 0){
-                //$this->Regla = $lnMedidorAnormalidad[0]->Regla;
-                $lnRegla = $lnMedidorAnormalidad[0]->Regla;
+                $this->Regla = $lnMedidorAnormalidad[0]->Regla;
+                //$lnRegla = $lnMedidorAnormalidad[0]->Regla;
                 $lnTipoConsumoSistema = $lnMedidorAnormalidad[0]->TipoConsumo;
 
                 if(($tnLecturaActual == $tnLecturaAnterior) && ($tnConsumoActual == 0)){
-                    if(($lnTipoConsumoSistema == $this->TipoConsumo->SinLectura) && ($lnRegla == $this->ReglaLecturacion->CONSUMO_PROMEDIO)){
+                    if(($lnTipoConsumoSistema == $this->TipoConsumo->SinLectura) && (/*$lnRegla*/$this->Regla == $this->ReglaLecturacion->CONSUMO_PROMEDIO)){
                         if(($tnConsumoMinimo > 0) && ($tnConsumoFacturado <= $tnConsumoMinimo) && ($tnMedia <= $tnConsumoMinimo)){
                             $lnResult = 0;
                         }else if($lnConsumoFacturado <> $tnMedia){
@@ -750,7 +750,7 @@ class GeneracionLecturaBLL{
                 $this->AplicarPromedio   = false;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = 0; // TODO : guardar segun calculo
+                //$this->gnConsumoFacturado = 0; // TODO : guardar segun calculo
                 $this->DesviacionSignificativa = (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoBajo) || ($this->gnTipoConsumo == $this->TipoConsumo->ConsumoAlto));
                 $MedidorAnormalidad = $MedidorAnormalidadDAL->GetRecDt($this->gnMedidorAnormalidad, $this->DataBaseAlias);
                 $this->InspeccionRequerido = $MedidorAnormalidad[0]->Inspeccion;
@@ -790,7 +790,7 @@ class GeneracionLecturaBLL{
                 $this->AplicarPromedio   = false;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = 0;
+                //$this->gnConsumoFacturado = 0;
                 $this->DesviacionSignificativa = (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoBajo) || ($this->gnTipoConsumo == $this->TipoConsumo->ConsumoAlto));
                 $this->InspeccionRequerido = false;
                 $this->Facturado = false;
@@ -863,7 +863,7 @@ class GeneracionLecturaBLL{
                 $this->AplicarPromedio   = false;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = 0;
+                //$this->gnConsumoFacturado = 0;
                 $this->DesviacionSignificativa = (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoBajo) || ($this->gnTipoConsumo == $this->TipoConsumo->ConsumoAlto));
                 $MedidorAnormalidad = $MedidorAnormalidadDAL->GetRecDt($this->gnMedidorAnormalidad, $this->DataBaseAlias);
                 $this->InspeccionRequerido = $MedidorAnormalidad[0]->Inspeccion;
@@ -891,6 +891,10 @@ class GeneracionLecturaBLL{
 
         public function Aplicar_ConsumoPromedio(){
             try {
+                if($this->gnMedia > $this->gnConsumoMinimo){ // 20-11-2022
+                    $this->gnConsumoFacturado = $this->gnMedia;
+                }
+
                 $MedidorAnormalidadDAL     = new MedidorAnormalidadDAL;
                 $GeneracionLecturaDAL      = new GeneracionLecturaDAL;
                 $GeneracionLecturaMovilDAL = new GeneracionLecturaMovilDAL;
@@ -908,7 +912,7 @@ class GeneracionLecturaBLL{
                 $this->AplicarPromedio   = true;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = $this->gnMedia;
+                //$this->gnConsumoFacturado = $this->gnMedia;
                 $this->DesviacionSignificativa = false;
                 $this->InspeccionRequerido = true;
                 $this->Facturado = true;
@@ -950,7 +954,7 @@ class GeneracionLecturaBLL{
                 $this->AplicarPromedio   = false;
                 $this->gnAjusteConsumo    = 0;
                 $this->gnAjusteMonto      = 0;
-                $this->gnConsumoFacturado = 0;
+                //$this->gnConsumoFacturado = 0;
                 $this->DesviacionSignificativa = (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoBajo) || ($this->gnTipoConsumo == $this->TipoConsumo->ConsumoAlto));
                 $MedidorAnormalidad = $MedidorAnormalidadDAL->GetRecDt($this->gnMedidorAnormalidad, $this->DataBaseAlias);
                 $this->InspeccionRequerido = $MedidorAnormalidad[0]->Inspeccion;

@@ -84,19 +84,19 @@ class LecturaMovilRestNET
 
     public function WMSincronizarCaS($request){
         $loSincronizar = new SincronizarDAL;
-        $datos["TRAYECTORIA"] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias);
-        $datos["GENERACIONFACTURA"] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias);
-        $datos["GENERACIONLECTURA"] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias);
-        $datos["GENERACIONFACTURAMOVIL"] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias);
-        $datos["MODIFICACIONGENERACIONLECTURA"] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias);
+        $datos['TRAYECTORIA'] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias);
+        $datos['GENERACIONFACTURA'] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias);
+        $datos['GENERACIONLECTURA'] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias);
+        $datos['GENERACIONFACTURAMOVIL'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias);
+        $datos['MODIFICACIONGENERACIONLECTURA'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias);
 
-        $lcURL = $this->cURLBase . "/WMSincronizarCaS?taDatos=".response().json($datos);
+        /*$lcURL = $this->cURLBase . "/WMSincronizarCaS?taDatos=".response().json($datos);
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus = $loResponse->getStatusCode();
         
         $lnStatus = ($lnStatus == 200) ? 1 : 0;
-        return $lnStatus;
-        //return response()->json($datos);
+        return $lnStatus;*/
+        return response()->json($datos);
     }
 
     /*public function verificarConexionRestNET($request)
