@@ -90,13 +90,13 @@ class LecturaMovilRestNET
         $datos['GENERACIONFACTURAMOVIL'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias);
         $datos['MODIFICACIONGENERACIONLECTURA'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias);
 
-        /*$lcURL = $this->cURLBase . "/WMSincronizarCaS?taDatos=".response().json($datos);
+        $lcURL = $this->cURLBase . "/WMSincronizarCaS?taDatos=".response().json($datos);
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus = $loResponse->getStatusCode();
         
         $lnStatus = ($lnStatus == 200) ? 1 : 0;
-        return $lnStatus;*/
-        return response()->json($datos);
+        return $lnStatus;
+        /*return response()->json($datos);*/
     }
 
     /*public function verificarConexionRestNET($request)
