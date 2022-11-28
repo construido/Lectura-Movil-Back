@@ -84,13 +84,15 @@ class LecturaMovilRestNET
 
     public function WMSincronizarCaS($request){
         $loSincronizar = new SincronizarDAL;
-        $datos['TRAYECTORIA'] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias);
-        $datos['GENERACIONFACTURA'] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias);
-        $datos['GENERACIONLECTURA'] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias);
-        $datos['GENERACIONFACTURAMOVIL'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias);
-        $datos['MODIFICACIONGENERACIONLECTURA'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias);
+        $datos['TRAYECT'] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias); //TRAYECTORIA
+        $datos['GENFACT'] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias); //GENERACIONFACTURA
+        $datos['GENLECT'] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURA
+        $datos['GENLECTN'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMOVIL
+        $datos['MODGENLE'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //MODIFICACIONGENERACIONLECTURA
+        $datos['GENLECTM'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMODIFICADO - sin uso
+        $datos['SOCIOSCORTE'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //SOCIOSCORTE
 
-        $lcURL = $this->cURLBase . "/WMSincronizarCaS?taDatos=".response().json($datos);
+        $lcURL = $this->cURLBase . "/WMSincronizarJsonCaS?tcPaqueteJson=".response().json($datos);
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus = $loResponse->getStatusCode();
         

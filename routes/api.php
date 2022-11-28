@@ -71,4 +71,4 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
 // ejecutar para que funcione en celular
 // tymon/config/config.php TODO - para cambiar el tiempo que dure activo el token de session
 
-Route::post('/WMSincronizarCaS', [LecturaMovilController::class,'WMSincronizarCaS']);
+//Route::post('/WMSincronizarCaS', [LecturaMovilController::class,'WMSincronizarCaS']);
