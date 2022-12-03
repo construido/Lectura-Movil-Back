@@ -7,6 +7,7 @@ use App\DAL\SincronizarDAL;
 
 use GuzzleHttp\Client;
 use SimpleXMLElement;
+use Exception;
 
 class LecturaMovilRestNET
 {
@@ -18,8 +19,6 @@ class LecturaMovilRestNET
 
     function __construct($tnEmpresa) 
     {
-        //$tnEmpresa es la empresa ID el cual cuando se logea el Lecturador debe manda cada vez que use esta clase para sacar de la DB el IP de la emprea 
-        //al cual vamos a acceder para leer y guardar...
         set_time_limit(240);
         $this->loClient = new Client();
         $this->cEmpresa = $this->datosEmpresa();
@@ -42,12 +41,11 @@ class LecturaMovilRestNET
     }
 
     public function WMAutenticar($login, $password){
-        /*$this->cEmpresa = $this->datosEmpresa();
-        $this->cURLBase = "http://" . $this->cEmpresa[0]->ServerIP . $this->cEndPointBase;
-        $lcURL      = $this->cURLBase . "/WMAutenticar?login=".$this->cEmpresa[0]->LoginEmpresa."&password=".$this->cEmpresa[0]->PasswordEmpresa;*/
-        //echo $login . $password;
         $lcURL      = $this->cURLBase . "/WMAutenticar?login=".$login."&password=".$password;
         $loResponse = $this->loClient->get($lcURL);
+        // $param = ["login" => $login, "password" => $password];
+        // $lcURL      = $this->cURLBase . "/WMAutenticar";
+        // $loResponse = $this->loClient->post($lcURL, ["query" => $param]);
         $lnStatus   = $loResponse->getStatusCode();
         $loContents = $loResponse->getBody()->getContents();
         $loContents =  $this->convetirXMLaJSON($loContents);
@@ -56,14 +54,14 @@ class LecturaMovilRestNET
     }
 
     public function WMGet_Lecturas_Pendientes(){
-        /*$this->loUserAccess = $this->WMAutenticar('', '');
-        $lcURL      = $this->cURLBase . "/WMGet_Lecturas_Pendientes?useraccess=".$this->loUserAccess."&id_plomero=".$this->cEmpresa[0]->Plomero;*/
         $urlEncode = urlencode($this->loUserAccess);
         $lcURL      = $this->cURLBase . "/WMGet_Lecturas_Pendientes?useraccess=".$urlEncode."&id_plomero=".$this->cEmpresa[0]->Plomero;
         $loResponse = $this->loClient->get($lcURL);
         $lnStatus   = $loResponse->getStatusCode();
         $loContents = $loResponse->getBody()->getContents();
-        return $this->convetirXMLaJSON($loContents);
+        $loContents = $this->convetirXMLaJSON($loContents);
+        $loContents = $loContents['diffgrdiffgram']['NewDataSet']['Table'];
+        return $loContents;
     }
 
     public function WMSincronizacionBDListDemo($request){
@@ -83,22 +81,28 @@ class LecturaMovilRestNET
     }
 
     public function WMSincronizarCaS($request){
-        $loSincronizar = new SincronizarDAL;
-        $datos['TRAYECT'] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias); //TRAYECTORIA
-        $datos['GENFACT'] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias); //GENERACIONFACTURA
-        $datos['GENLECT'] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURA
-        $datos['GENLECTN'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMOVIL
-        $datos['MODGENLE'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //MODIFICACIONGENERACIONLECTURA
-        $datos['GENLECTM'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMODIFICADO - sin uso
-        $datos['SOCIOSCORTE'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //SOCIOSCORTE
+        try {
+            $loSincronizar = new SincronizarDAL;
+            $datos['TRAYECT'] = $loSincronizar->Get_Trayectoria($request->Plomero, $request->DataBaseAlias); //TRAYECTORIA
+            $datos['GENFACT'] = $loSincronizar->Get_GeneracionFactura($request->Plomero, $request->DataBaseAlias); //GENERACIONFACTURA
+            $datos['GENLECT'] = $loSincronizar->Get_GeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURA
+            $datos['GENLECTN'] = $loSincronizar->Get_GeneracionLecturaMovil($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMOVIL
+            $datos['MODGENLE'] = $loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //MODIFICACIONGENERACIONLECTURA
+            $datos['GENLECTM'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //GENERACIONLECTURAMODIFICADO - sin uso
+            $datos['SOCIOSCORTE'] = []; //$loSincronizar->Get_ModificacionGeneracionLectura($request->Plomero, $request->DataBaseAlias); //SOCIOSCORTE
+            $datos = json_encode($datos);
+            $datos = base64_encode($datos);
+    
+            $lcURL = $this->cURLBase . "/WMSincronizarJsonCaS?tcPaqueteJsonBase64=".$datos;
+            $loResponse = $this->loClient->get($lcURL);
+            $lnStatus = $loResponse->getStatusCode();
+            
+            $lnStatus = ($lnStatus == 200) ? 1 : 0;
 
-        $lcURL = $this->cURLBase . "/WMSincronizarJsonCaS?tcPaqueteJson=".response().json($datos);
-        $loResponse = $this->loClient->get($lcURL);
-        $lnStatus = $loResponse->getStatusCode();
-        
-        $lnStatus = ($lnStatus == 200) ? 1 : 0;
+        } catch (Exception $th) {
+            $lnStatus =  $th->getMessage();
+        }
         return $lnStatus;
-        /*return response()->json($datos);*/
     }
 
     /*public function verificarConexionRestNET($request)

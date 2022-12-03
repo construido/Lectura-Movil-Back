@@ -18,8 +18,7 @@ class LecturaMovilController extends Controller
     public function WMGet_Lecturas_Pendientes(){
         $loLMRestNET = new LecturaMovilRestNET(6);
         $loContents = $loLMRestNET->WMGet_Lecturas_Pendientes();
-        $loContents = $loContents['diffgrdiffgram']['NewDataSet']['Table'];
-        return $loContents;
+        return response()->json($loContents);
     }
 
     public function WMSincronizacionBDListDemo(Request $request){
