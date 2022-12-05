@@ -21,6 +21,7 @@ use App\DAL\CreditoDAL;
 use App\DAL\FechaDAL;
 
 use App\Modelos\ReglaLecturacion;
+use App\Modelos\GuardarErrores;
 
     // La primera indica el tipo de variable
     // •	l - Local
@@ -443,6 +444,9 @@ class FacturaBLL
         $r_ini = 0;
         $r_fin = 0;
         $i = 0;
+        // $ini = [];
+        // $fin = [];
+        // $total = [];
         if ($ConsumoFacturado > $lnConsumoMinimo)
         {
             $swNoSalir = true;
@@ -452,21 +456,25 @@ class FacturaBLL
                     $swNoSalir = false;
                 }
                 
-                $r_ini = $CategoriaDetalle[0]->Inicio;
-                $r_fin = $CategoriaDetalle[0]->Fin;
+                $r_ini = $CategoriaDetalle[$i]->Inicio;
+                $r_fin = $CategoriaDetalle[$i]->Fin;
+                // $ini[$i] = $r_ini;
+                // $fin[$i] = $r_fin;
                 if (($r_ini <= $ConsumoFacturado) && ($ConsumoFacturado <= $r_fin))
                 {
-                    $lnMto_IPC = $this->actIPC($CategoriaDetalle[0]->MontoAlcantarillado);
+                    $lnMto_IPC = $this->actIPC($CategoriaDetalle[$i]->MontoAlcantarillado);
                     $tnTotal   = $tnTotal + ($ConsumoFacturado - $r_ini + 1) * $lnMto_IPC;
                     $swNoSalir = false;
                 }
                 else
                 {
-                    $lnMto_IPC = $this->actIPC($CategoriaDetalle[0]->MontoAlcantarillado);
+                    $lnMto_IPC = $this->actIPC($CategoriaDetalle[$i]->MontoAlcantarillado);
                     $tnTotal   = $tnTotal + ($r_fin - $r_ini + 1) * $lnMto_IPC;
                 }
+                // $total[$i] = $tnTotal;
                 $i++;
             } while ($swNoSalir);
+            // GuardarErrores::GuardarLog(0, "r_Alcantar(CF:".$ConsumoFacturado." C:".$Cliente." DBA:".$DataBaseAlias.")", json_encode($ini), json_encode($fin), json_encode($total));
         }
         return round($tnTotal, 2);
     }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\MedidorAnormalidadController;
 use App\Http\Controllers\GeneracionFacturaController;
 use App\Http\Controllers\GeneracionLecturaController;
+use App\Http\Controllers\MarcaMedidorController;
 use App\Http\Controllers\LecturaMovilController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\UsuarioController;
@@ -62,6 +63,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
 
     // RUTAS PARA LA IMPRESIÓN DE LA FACTURA
     Route::post('/CrearFactura', [FacturaController::class,'CrearFactura']);
+
+    // RUTA PARA LA TABLA MARCAMEDIDOR
+    Route::post('/llenarSelectMarca', [MarcaMedidorController::class,'llenarSelectMarca']);
 });
 
 //----------------------------------------------------------------------//
