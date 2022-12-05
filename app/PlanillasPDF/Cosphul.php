@@ -16,7 +16,6 @@ use App\DAL\FacturaDAL;
 use App\Http\Controllers\UsuarioController;
 
 use Tymon\JWTAuth\Facades\JWTAuth;
-
 use DB;
 
 use PDF;
@@ -97,6 +96,7 @@ class Cosphul //ImprimirBLL
                     $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                 }else{
                     $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
+                    $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
                     $Historial = $Historial . '<td align="left" style="padding: 0;"> </td> </tr>';
                 }
 
@@ -123,10 +123,13 @@ class Cosphul //ImprimirBLL
                         $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                     }else{
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
+                        $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td> </tr>';
                     }
                 }
                 else{
+                    $Historial = '<tr> <td align="center" style="padding: 0; color:#FFFFFF"> PRUEBA </td>';
+                    $Historial = $Historial . '<td align="right" style="padding: 0; color:#FFFFFF;""> PRUEBA </td>';
                     $Historial = $Historial . '<td align="right" style="padding: 0; color:#FFFFFF;""> PRUEBA </td>';
                     $Historial = $Historial . '<td align="left" style="padding: 0; color:#FFFFFF;""> PRUEBA </td>';
 
@@ -138,15 +141,15 @@ class Cosphul //ImprimirBLL
                         $ImporteFactura = $ImporteFactura + $laFacturaDetalle[$i]->MontoPago;
                     }else{
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
+                        $Historial = $Historial . '<td align="left" style="padding: 0;"> </td>';
                         $Historial = $Historial . '<td align="left" style="padding: 0;"> </td> </tr>';
                     }
                 }
                 
             }
-
             $Historico = $Historico . $Historial;
         }
-
+        
         $DeudaAtrasada = $TotalDeuda;
         $TotalDeuda = $TotalDeuda + $laFacturaCliente[0]->MontoTotal;
 
@@ -231,7 +234,6 @@ class Cosphul //ImprimirBLL
                         <td height="90px" colspan="6" align="left" style="font-size: 30px; padding: 0;">'. $laCliente[0]->Nombre .'</td>
                         <td colspan="2" align="left" style="padding-top: 0; padding-bottom: 0;  padding-left: 50px; padding-right: 0;">'. $laCliente[0]->NombreCategoria .'</td>
                         <td colspan="2" align="right" style="padding-right: 50px;">'. date('d/m/Y') .'</td>
-                        <td class="rotate" rowspan="20" style="padding: 0; font-size: 18px;"><div>'.$Lecturador.'</div></td>
                     </tr>
                     <tr>
                         <td colspan="6" align="left" style="padding: 0;"> UV- '. $laCliente[0]->Uv .' MZ. '. $laCliente[0]->Manzana .' L. '. $laCliente[0]->Lote .' '. $laCliente[0]->Direccion .'</td>
