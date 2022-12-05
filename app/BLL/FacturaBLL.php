@@ -167,7 +167,7 @@ class FacturaBLL
 
             $lnConsumoFacturado = $this->goGeneracionLectura[0]->Consumo;
             $this->gnMoneda     = $this->goCategoria[0]->Moneda;
-            $this->gnMto_Pago   = $this->r_consumo($lnConsumoFacturado, $Cliente, $DataBaseAlias); 
+            $this->gnMto_Pago   = $this->r_consumo($lnConsumoFacturado, $Cliente, $DataBaseAlias);
             
             if ($this->gnMoneda == 3){
                 $this->gnMoneda = 2;
@@ -226,6 +226,9 @@ class FacturaBLL
                 $ipcValue  = 0;
                 $total_acc = 0;
                 $rangoDiff = 0;
+                $Inicio = [];
+                $Fin = [];
+                $Total = [];
 
                 if ($ConsumoFacturado > $lnConsumoMinimo)
                 {
@@ -238,6 +241,8 @@ class FacturaBLL
 
                         $r_ini = $this->goCategoriaDetalle[$i]->Inicio;
                         $r_fin = $this->goCategoriaDetalle[$i]->Fin;
+                        $Inicio[$i] = $r_ini;
+                        $Fin[$i] = $r_fin;
 
                         if (($r_ini <= $ConsumoFacturado) && ($ConsumoFacturado <= $r_fin))
                         {
@@ -254,6 +259,7 @@ class FacturaBLL
                             $total_acc = $rangoDiff * $ipcValue;
                             $lnTotal = $lnTotal + $total_acc;
                         }
+                        $Total[$i] = $lnTotal;
                         $i++;
                     } while ($swNoSalir);
                 }
@@ -320,6 +326,9 @@ class FacturaBLL
     }
 
     public function DO_GrabarDetalle($Cliente, $ItemTipo, $Servicio, $DataBaseAlias){
+        $loCategoria = new CategoriaDAL;
+        $loCategoria = $loCategoria->GetRecDt($this->gnCategoria, $DataBaseAlias);
+
         if ($this->gnMoneda == 1)
             $this->gnMto_Pago = ($this->gnMto_Pago * $this->gnTipoCambio); // redondear a dos decimales
 
@@ -337,7 +346,10 @@ class FacturaBLL
         {
             if (($ItemTipo == 1))
             { // Consumo
-                $lnServicio = $this->goParametrosGenerales[0]->Consumo; // oParaGene["Consumo"].ToDecimal();
+                $lnServicio = $loCategoria[0]->ItemAAPP;
+                if($lnServicio == 0){
+                    $lnServicio = $this->goParametrosGenerales[0]->Consumo; // oParaGene["Consumo"].ToDecimal();
+                }
                 $lnTipoTabla = 1; //LECTURACION
             }
             else if (($ItemTipo == 2))
@@ -357,6 +369,7 @@ class FacturaBLL
             $lnTipoTabla = -1;
         }
 
+        // GuardarErrores::GuardarLog(0, "F:".$this->gnFactura, json_encode($this->gnMto_Pago), " TT:".$lnTipoTabla, " S:".$lnServicio);
         $this->FacturaDetalleDAL->ActualizarItem($this->gnFactura, $Cliente, $this->gnMto_Pago, $lnTipoTabla, $lnServicio, $DataBaseAlias);
 
         // if (($ItemTipo == 1) && (this.ModoFacturacion == 2)) // Inspeccion
