@@ -44,6 +44,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/verLecturaIdNext', [GeneracionLecturaController::class, 'verLecturaIdNext']);
     Route::post('/listarProcesadas', [GeneracionLecturaController::class, 'listarProcesadas']);
     Route::post('/listarLecturas', [GeneracionLecturaController::class, 'listarLecturas']);
+    Route::post('/buscarCliente', [GeneracionLecturaController::class, 'buscarCliente']);
     Route::post('/verLecturaId', [GeneracionLecturaController::class, 'verLecturaId']);
     
     // RUTAS DE LA TABLA GENERACIONFACTURA DE LA BASE DE DATOS LECTURA MOVIL
