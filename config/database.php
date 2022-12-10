@@ -119,6 +119,25 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+        'mysql_LMCoopaguas' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL_5'),
+            'host' => env('DB_HOST_5', '127.0.0.1'),
+            'port' => env('DB_PORT_5', '3306'),
+            'database' => env('DB_DATABASE_5', 'forge'),
+            'username' => env('DB_USERNAME_5', 'forge'),
+            'password' => env('DB_PASSWORD_5', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false, // Se cambio a false para que las consultas de MySQL no sean strictas - salía error al usar groupBy
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',
