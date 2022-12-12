@@ -73,9 +73,10 @@ class ReglaLecturacionDetalleDAL
         return $lcResult;
     }
 
-    public function GetIDBy($Regla){
+    public function GetIDBy($Regla, $DataBaseAlias){
 
-        $laReglaLecturacionDetalle = ReglaLecturacionDetalle::on('mysql_LMCoopaguas')
+        // $laReglaLecturacionDetalle = ReglaLecturacionDetalle::on('mysql_LMCoopaguas')
+        $laReglaLecturacionDetalle = ReglaLecturacionDetalle::on($DataBaseAlias)
             ->where('ReglaLecturacion', '=', $Regla)
             ->get();
 

@@ -253,7 +253,7 @@ class GeneracionLecturaBLL{
                     $lnResult = $this->AnormalidadCorrecta($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->MedidorInfo->MedidorTipoComportamiento);
                 }
             }
-
+            // GuardarErrores::GuardarLog(0, "ValidarLectura()", $lnResult, 0, 0);
             return $lnResult;
         }
 
@@ -323,7 +323,8 @@ class GeneracionLecturaBLL{
                         return 4;
                     }
                 }
-                $ReglaLec = $loReglaLecturacionDetalle->GetIDBy($this->Regla);
+                $ReglaLec = $loReglaLecturacionDetalle->GetIDBy($this->Regla, $this->DataBaseAlias);
+                // GuardarErrores::GuardarLog(0, "AnormalidadCorrecta()", $ReglaLec, 'Linea 327', 0);
                 
                 if (count($ReglaLec) > 0) { //VERIFICAMOS SI LA REGLA ES APLICABLE AL TIPOCONSUMO
                     $llAplicable = $loReglaLecturacionDetalle->ReglaAplicable($tnTipoConsumo);

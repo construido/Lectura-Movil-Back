@@ -42,6 +42,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/verLecturaIdProcesada', [GeneracionLecturaController::class, 'verLecturaIdProcesada']);
     Route::post('/DO_LecturarNormal', [GeneracionLecturaController::class, 'DO_LecturarNormal']);
     Route::post('/verLecturaIdNext', [GeneracionLecturaController::class, 'verLecturaIdNext']);
+    Route::post('/listarPendientes', [GeneracionLecturaController::class, 'listarPendientes']);
     Route::post('/listarProcesadas', [GeneracionLecturaController::class, 'listarProcesadas']);
     Route::post('/listarLecturas', [GeneracionLecturaController::class, 'listarLecturas']);
     Route::post('/buscarCliente', [GeneracionLecturaController::class, 'buscarCliente']);
