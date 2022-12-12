@@ -39,6 +39,8 @@ class MedidorAnormalidadController extends Controller
         $lcTipo  = $request->tcTipo;
         $lcDato  = $request->tcDato;
 
+        $laMedidorAnormalidad;
+
         switch ($lcOrden) {
             case 'top10':
                 $columna = 'Frecuencia';
