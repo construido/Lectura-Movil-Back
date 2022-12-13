@@ -43,9 +43,6 @@ class LecturaMovilRestNET
     public function WMAutenticar($login, $password){
         $lcURL      = $this->cURLBase . "/WMAutenticar?login=".$login."&password=".$password;
         $loResponse = $this->loClient->get($lcURL);
-        // $param = ["login" => $login, "password" => $password];
-        // $lcURL      = $this->cURLBase . "/WMAutenticar";
-        // $loResponse = $this->loClient->post($lcURL, ["query" => $param]);
         $lnStatus   = $loResponse->getStatusCode();
         $loContents = $loResponse->getBody()->getContents();
         $loContents =  $this->convetirXMLaJSON($loContents);

@@ -61,11 +61,15 @@ class Cosphul //ImprimirBLL
         if (isset($laHistorial[0]->M3)) $ConsumoAnterior = $laHistorial[0]->M3;
         else $ConsumoAnterior = 0;
 
-        $FechaActual = date('Y-m-d');
-        $datetime1 = date_create($FechaActual);
-        $datetime2 = date_create($FechaAnterior[0]->FechaLectura);
-        $contador = date_diff($datetime1, $datetime2);
-        $differenceFormat = '%a';
+        $contador = 0;
+        if(isset($FechaAnterior[0]->FechaLectura)){
+            $FechaActual = date('Y-m-d');
+            $datetime1 = date_create($FechaActual);
+            $datetime2 = date_create($FechaAnterior[0]->FechaLectura);
+            $contador = date_diff($datetime1, $datetime2);
+            $differenceFormat = '%a';
+            $contador = $contador->format($differenceFormat);
+        }
 
         $laFacturaDetalle = new FacturaDetalleDAL;
         $laFacturaDetalle = $laFacturaDetalle->GetDetalleFactura($Cliente, $DataBaseAlias);
@@ -266,7 +270,7 @@ class Cosphul //ImprimirBLL
                         <td align="right" style="padding: 0;">'. $Lectura_Actual .'</td>
                         <td rowspan="2" colspan="1" align="right" style="padding: 0; font-size: 30px;">'. $Consumo .'</td>
                         <td rowspan="2" align="right" style="font-size: 30px; padding-top: 0; padding-bottom: 0;  padding-left: 0; padding-right: 20px;">'.$laFacturaCliente[0]->MedidorAnormalidad.'</td>
-                        <td rowspan="2" colspan="1" align="left" style="font-size: 30px; padding-top: 0; padding-bottom: 0;  padding-left: 70px; padding-right: 0;">'.($contador->format($differenceFormat)).'</td>
+                        <td rowspan="2" colspan="1" align="left" style="font-size: 30px; padding-top: 0; padding-bottom: 0;  padding-left: 70px; padding-right: 0;">'.($contador).'</td>
                         <td rowspan="2" colspan="1" align="center" style="font-size: 30px;">'. $DeudaAtrasada .'</td>
                         <td rowspan="2" colspan="2" align="center" style="font-size: 30px;">'. $NumeroMeses .'</td>
                         <td colspan="2" align="right" style="padding-right: 75px;">'. (empty($FechaCorte) ? "" : "SÍ") .'</td>
