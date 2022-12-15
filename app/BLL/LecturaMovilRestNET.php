@@ -58,7 +58,15 @@ class LecturaMovilRestNET
         $loContents = $loResponse->getBody()->getContents();
         $loContents = $this->convetirXMLaJSON($loContents);
         $loContents = $loContents['diffgrdiffgram']['NewDataSet']['Table'];
-        return $loContents;
+
+        $array = [];
+        if(isset($loContents['id_genfact'])) {
+            array_push($array, $loContents);
+        }else {
+            $array = $loContents;
+        }
+
+        return $array;
     }
 
     public function WMSincronizacionBDListDemo($request){

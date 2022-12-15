@@ -37,9 +37,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/showById', [UsuarioController::class,'showById']);
 
     // RUTAS DE LA TABLA GENERACIONLECTURA DE LA BASE DE DATOS LECTURA MOVIL
+    Route::post('/lecturasPendientesAnormalidades', [GeneracionLecturaController::class, 'lecturasPendientesAnormalidades']);
     Route::post('/lecturasPendientesLecturados', [GeneracionLecturaController::class, 'lecturasPendientesLecturados']);
     Route::post('/verLecturaIdNextProcesada', [GeneracionLecturaController::class, 'verLecturaIdNextProcesada']);
+    Route::post('/verLecturaIdNextPendiente', [GeneracionLecturaController::class, 'verLecturaIdNextPendiente']);
     Route::post('/verLecturaIdProcesada', [GeneracionLecturaController::class, 'verLecturaIdProcesada']);
+    Route::post('/verLecturaIdPendiente', [GeneracionLecturaController::class, 'verLecturaIdPendiente']);
     Route::post('/DO_LecturarNormal', [GeneracionLecturaController::class, 'DO_LecturarNormal']);
     Route::post('/verLecturaIdNext', [GeneracionLecturaController::class, 'verLecturaIdNext']);
     Route::post('/listarPendientes', [GeneracionLecturaController::class, 'listarPendientes']);

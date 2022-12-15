@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Models\MedidorAnormalidad;
 use App\Models\GeneracionLectura;
+use App\Models\ParametroLectura;
 
 use App\Modelos\mPaqueteTodoFacil;
 
@@ -39,6 +41,67 @@ use App\Http\Controllers\TrayectoriaController;
 
 class GeneracionLecturaController extends Controller
 {
+    public function verLecturaIdPendiente(Request $request){
+        $lnDataBaseAlias     = $request->DataBaseAlias;
+        $lnGeneracionFactura = $request->input('tcGeneracionFactura');
+        $lnAnormalidad       = $request->input('tcAnormalidad');
+        $lnCliente           = $request->input('tcCliente');
+
+        $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+        ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+        ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+        ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+        ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
+        ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+        ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', $lnAnormalidad)
+        ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
+        ->get();
+
+        $loPaquete = new mPaqueteTodoFacil();
+        $loPaquete->values = $loGeneracionLectura;
+        return response()->json($loPaquete);
+    }
+
+    public function verLecturaIdNextPendiente(Request $request){
+        $lnDataBaseAlias     = $request->DataBaseAlias;
+        $lnAnormalidad       = $request->tcAnormalidad;
+        $lnCodigpUbicacion   = $request->CodigoUbicacion;
+        $lnGeneracionFactura = $request->input('tcGeneracionFactura');
+
+        $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+        ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+        ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
+        ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
+        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+        ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
+        ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', $lnAnormalidad)
+        ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')  // TODO : se aumento MedidorAnormalidad2
+        ->where(function($query){
+            $query->where('GENERACIONLECTURA.LecturaActual', '>', '0')
+            ->orWhere('GENERACIONLECTURA.Consumo', '>', '0')
+            ->orWhere('GENERACIONLECTURA.MedidorAnormalidad', '>', '0');
+        })
+        ->having('GENERACIONLECTURA.CodigoUbicacion', '>', $lnCodigpUbicacion)
+        ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
+        ->limit('1')
+        ->get();
+
+        $loPaquete = new mPaqueteTodoFacil();
+        $loPaquete->values = $loGeneracionLectura;
+        return response()->json($loPaquete);
+    }
+
     public function buscarCliente(Request $request){
         $lnDataBaseAlias     = $request->DataBaseAlias;
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
@@ -642,6 +705,43 @@ class GeneracionLecturaController extends Controller
         (DB::raw('count(GENERACIONLECTURA.GeneracionFactura) as Pendientes')),
         (DB::raw('sum(case when (GENERACIONLECTURA.LecturaActual = 0 and GENERACIONLECTURA.Consumo = 0 and GENERACIONLECTURA.MedidorAnormalidad = 0) then 00000 else 00001 end) as Lecturados')))
         ->where('GENERACIONLECTURA.GeneracionFactura', '=', $request->tcGeneracionFactura)->get();
+
+        $loPaquete = new mPaqueteTodoFacil();
+        $loPaquete->values = $loGeneracionLectura;
+        return response()->json($loPaquete);
+    }
+
+    public function AnormalidadPendiente($DataBaseAlias){
+        $parametroLectura = ParametroLectura::on($DataBaseAlias)
+            ->select('AnormalidadPendiente')
+            ->join('MEDIDORANORMALIDAD', 'PARAMETROLECTURA.AnormalidadPendiente', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+            ->get();
+
+        return $parametroLectura[0]->AnormalidadPendiente;
+    }
+
+    public function lecturasPendientesAnormalidades(Request $request){
+        $lnDataBaseAlias = $request->DataBaseAlias;
+        $tipo            = $request->tcTipo;
+
+        switch ($tipo) {
+            case 'LecturaPendiente':
+                $anormalidad = $this->AnormalidadPendiente($lnDataBaseAlias);
+                $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+                    ->select('GENERACIONLECTURA.GeneracionFactura',
+                        (DB::raw('count(GENERACIONLECTURA.GeneracionFactura) as Pendientes')),
+                        (DB::raw('sum(case when (GENERACIONLECTURA.MedidorAnormalidad = '.$anormalidad.') then 00001 else 00000 end) as Lecturados')))
+                    ->where('GENERACIONLECTURA.GeneracionFactura', '=', $request->tcGeneracionFactura)->get();
+                break;
+            
+            case 'MedidorAnormalidad':
+                $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+                ->select('GENERACIONLECTURA.GeneracionFactura',
+                        (DB::raw('count(GENERACIONLECTURA.GeneracionFactura) as Pendientes')),
+                        (DB::raw('sum(case when (GENERACIONLECTURA.MedidorAnormalidad = '.$request->Anormalidad.') then 00001 else 00000 end) as Lecturados')))
+                    ->where('GENERACIONLECTURA.GeneracionFactura', '=', $request->tcGeneracionFactura)->get();
+                break;
+        }
 
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
