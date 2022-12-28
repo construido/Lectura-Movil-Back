@@ -58,6 +58,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     // RUTAS DE LA TABLA MEDIDORANORMALIDAD DE LA BASE DE DATOS LECTURA MOVIL
     Route::post('/llenarSelectAnormalidad', [MedidorAnormalidadController::class, 'llenarSelectAnormalidad']);
     Route::post('/AnormalidadesDeMedidor', [MedidorAnormalidadController::class, 'AnormalidadesDeMedidor']);
+    Route::post('/Categorizar', [MedidorAnormalidadController::class, 'Categorizar']);
 
     // RUTAS PARA EL ENVIO DE DATOS A LA DB´s DE LAS EMPRESAS
     Route::post('/WMSincronizacionBDListDemo', [LecturaMovilController::class,'WMSincronizacionBDListDemo']);

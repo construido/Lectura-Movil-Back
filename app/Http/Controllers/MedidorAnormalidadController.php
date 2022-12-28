@@ -159,4 +159,14 @@ class MedidorAnormalidadController extends Controller
 
         return response()->json($loPaquete);
     }
+
+    public function Categorizar(Request $request){
+        $laMedidorAnormalidad = MedidorAnormalidad::on($request->DataBaseAlias)
+            ->select('PARAMETROLECTURA.AnormalidadVerificarCategoria', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre')
+            ->join('PARAMETROLECTURA', 'MEDIDORANORMALIDAD.MedidorAnormalidad', '=', 'PARAMETROLECTURA.AnormalidadVerificarCategoria')
+            ->join('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+            ->get();
+
+        return response()->json($laMedidorAnormalidad);
+    }
 }
