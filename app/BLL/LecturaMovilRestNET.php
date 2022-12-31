@@ -85,6 +85,27 @@ class LecturaMovilRestNET
         return $lnStatus;
     }
 
+    public function WMSincronizacionDatosGeneralesBDList($request){
+        $lcURL = $this->cURLBase . "/WMSincronizacionDatosGeneralesBDList?tcLogin=".$this->cEmpresa[0]->LoginEmpresa
+                ."&tcPassword=".$this->cEmpresa[0]->PasswordEmpresa
+                ."&tcAccesUser=".$this->loUserAccess
+                ."&tnPlomero=".$this->cEmpresa[0]->Plomero
+                    ."&tnGeneracionFactura=0"
+                    ."&tnGeneracionFactura1=0"
+                    ."&tnGeneracionFactura3=0";
+        
+        $loResponse = $this->loClient->get($lcURL);
+        $lnStatus = $loResponse->getStatusCode();
+        $loContents = $loResponse->getBody()->getContents();
+        $loContents = $this->convetirXMLaJSON($loContents);
+        $loContents = $loContents[0];
+
+        $lnStatus = ($loContents == "1") ? 1 : 0;
+        return $lnStatus;
+    }
+
+    // WMSincronizacionDatosGeneralesBDList(string tcLogin, string tcPassword, string tcAccesUser, decimal tnPlomero, decimal tnGeneracionFactura, decimal tnGeneracionFactura1, decimal tnGeneracionFactura3)
+
     public function WMSincronizarCaS($request){
         try {
             $loSincronizar = new SincronizarDAL;

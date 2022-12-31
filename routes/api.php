@@ -61,6 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/Categorizar', [MedidorAnormalidadController::class, 'Categorizar']);
 
     // RUTAS PARA EL ENVIO DE DATOS A LA DB´s DE LAS EMPRESAS
+    Route::post('/WMSincronizacionDatosGeneralesBDList', [LecturaMovilController::class,'WMSincronizacionDatosGeneralesBDList']);
     Route::post('/WMSincronizacionBDListDemo', [LecturaMovilController::class,'WMSincronizacionBDListDemo']);
     Route::post('/WMGet_Lecturas_Pendientes', [LecturaMovilController::class,'WMGet_Lecturas_Pendientes']);
     Route::post('/verificarConexionRestNET', [LecturaMovilController::class,'verificarConexionRestNET']);
