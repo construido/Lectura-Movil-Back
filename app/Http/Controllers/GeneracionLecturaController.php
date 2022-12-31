@@ -63,6 +63,9 @@ class GeneracionLecturaController extends Controller
         ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
         ->get();
 
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $loGeneracionLectura['Categorizar'] = false;
+
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
         return response()->json($loPaquete);
@@ -96,6 +99,9 @@ class GeneracionLecturaController extends Controller
         ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
         ->limit('1')
         ->get();
+
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $loGeneracionLectura['Categorizar'] = false;
 
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
@@ -615,9 +621,19 @@ class GeneracionLecturaController extends Controller
         ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
         ->get();
 
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $loGeneracionLectura['Categorizar'] = false;
+        
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
         return response()->json($loPaquete);
+    }
+
+    public function BuscarAnormalidadCategorizar($Anormalidad, $lnDataBaseAlias){
+        $loCategoria = ParametroLectura::on($lnDataBaseAlias)->where('AnormalidadVerificarCategoria', '=', $Anormalidad)->get();
+        $loCategoria = isset($loCategoria[0]->AnormalidadVerificarCategoria) ? true : false;
+
+        return $loCategoria;
     }
 
     public function verLecturaId(Request $request){
@@ -647,6 +663,7 @@ class GeneracionLecturaController extends Controller
      */
     public function verLecturaIdNext(Request $request){
         $lnDataBaseAlias = $request->DataBaseAlias;
+        $lnCodigpUbicacion   = $request->CodigoUbicacion;
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
@@ -656,6 +673,7 @@ class GeneracionLecturaController extends Controller
         ->where('GENERACIONLECTURA.Consumo', '=', 0)
         ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
+        ->having('GENERACIONLECTURA.CodigoUbicacion', '>', $lnCodigpUbicacion)
         ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
         ->limit('1')
         ->get();
@@ -691,6 +709,9 @@ class GeneracionLecturaController extends Controller
         ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
         ->limit('1')
         ->get();
+
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $loGeneracionLectura['Categorizar'] = false;
 
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
