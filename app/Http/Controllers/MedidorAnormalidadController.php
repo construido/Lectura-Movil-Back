@@ -169,4 +169,14 @@ class MedidorAnormalidadController extends Controller
 
         return response()->json($laMedidorAnormalidad);
     }
+
+    public function LecturaPendiente(Request $request){
+        $laMedidorAnormalidad = MedidorAnormalidad::on($request->DataBaseAlias)
+            ->select('PARAMETROLECTURA.AnormalidadPendiente', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre')
+            ->join('PARAMETROLECTURA', 'MEDIDORANORMALIDAD.MedidorAnormalidad', '=', 'PARAMETROLECTURA.AnormalidadPendiente')
+            ->join('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
+            ->get();
+
+        return response()->json($laMedidorAnormalidad);
+    }
 }

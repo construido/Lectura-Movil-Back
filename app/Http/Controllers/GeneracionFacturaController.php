@@ -162,6 +162,13 @@ class GeneracionFacturaController extends Controller
         return response()->json($loPaquete);
     }
 
+    public function AnormalidadesEspeciales($DataBaseAlias){
+        $loParametroLectura = ParametroLectura::on($DataBaseAlias)
+            ->select('AnormalidadNuevo', 'AnormalidadCambioMedidor', 'AnormalidadRegularizacionBajaTemporal')
+            ->get();
+        return $loParametroLectura;
+    }
+    
     public function lecturasPendientesLecturados($tcGeneracionFactura, $DataBaseAlias){
 
         $loGeneracionLectura = GeneracionLectura::on($DataBaseAlias)
@@ -171,5 +178,57 @@ class GeneracionFacturaController extends Controller
         ->where('GENERACIONLECTURA.GeneracionFactura', '=', $tcGeneracionFactura)->get();
 
         return $loGeneracionLectura;
+    }
+
+    public function listarTodasLasPlanilla(Request $request){
+        $lnDataBaseAlias = $request->DataBaseAlias;
+        $lnPlomero       = $request->Plomero;
+
+        if (JWTAuth::user()->Estado == 1) {
+            $laGeneracionFactura = GeneracionFactura::on($lnDataBaseAlias)
+            ->select('GENERACIONFACTURA.GeneracionFactura', 'GENERACIONFACTURA.Zona', 'GENERACIONFACTURA.Ruta', 'GENERACIONFACTURA.Cobro',
+                (DB::raw('DATE_FORMAT(GENERACIONFACTURA.FechaGeneracionLectura,"%d-%m-%Y") as FechaGeneracionLectura')),
+                (DB::raw('DATE_FORMAT(GENERACIONFACTURA.FechaGeneracionFactura,"%d-%m-%Y") as FechaGeneracionFactura')))
+            ->join('GENERACIONLECTURA', 'GENERACIONFACTURA.GeneracionFactura', '=', 'GENERACIONLECTURA.GeneracionFactura')
+            ->where('GENERACIONFACTURA.Generado', '=', 0)
+            ->where('GENERACIONFACTURA.Plomero', '=', $lnPlomero)
+            ->groupBy('GENERACIONFACTURA.GeneracionFactura')
+            ->orderBy('GENERACIONFACTURA.GeneracionFactura', 'ASC')
+            ->paginate(10);
+        }else{
+            if (JWTAuth::user()->Estado == 5) {
+                $laGeneracionFactura = GeneracionFactura::on($lnDataBaseAlias)
+                ->select('GENERACIONFACTURA.GeneracionFactura', 'GENERACIONFACTURA.Zona', 'GENERACIONFACTURA.Ruta', 'GENERACIONFACTURA.Cobro',
+                    (DB::raw('DATE_FORMAT(GENERACIONFACTURA.FechaGeneracionLectura,"%d-%m-%Y") as FechaGeneracionLectura')),
+                    (DB::raw('DATE_FORMAT(GENERACIONFACTURA.FechaGeneracionFactura,"%d-%m-%Y") as FechaGeneracionFactura')))
+                ->join('GENERACIONLECTURA', 'GENERACIONFACTURA.GeneracionFactura', '=', 'GENERACIONLECTURA.GeneracionFactura')
+                ->where('GENERACIONFACTURA.Generado', '=', 0)
+                ->groupBy('GENERACIONFACTURA.GeneracionFactura')
+                ->orderBy('GENERACIONFACTURA.GeneracionFactura', 'ASC')
+                ->paginate(10);
+            }
+        }
+
+        for ($i=0; $i < count($laGeneracionFactura); $i++) { 
+            $LPL = $this->lecturasPendientesLecturados($laGeneracionFactura[$i]->GeneracionFactura, $lnDataBaseAlias);
+            $laGeneracionFactura[$i]['Lecturados'] = $LPL[0]->Lecturados;
+            $laGeneracionFactura[$i]['Pendientes'] = $LPL[0]->Pendientes - $LPL[0]->Lecturados;
+        }
+
+        $laGeneracionFactura = [
+            'pagination' => [
+                'total' => $laGeneracionFactura->total(),
+                "current_page" => $laGeneracionFactura->currentPage(),
+                "per_page" => $laGeneracionFactura->perPage(),
+                "last_page" => $laGeneracionFactura->lastPage(),
+                "from" => $laGeneracionFactura->firstItem(),
+                "to" => $laGeneracionFactura->lastItem(),
+            ],
+            'laGeneracionFactura' => $laGeneracionFactura
+        ];
+
+        $loPaquete = new mPaqueteTodoFacil();
+        $loPaquete->values = $laGeneracionFactura;
+        return response()->json($loPaquete);
     }
 }

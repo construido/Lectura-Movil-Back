@@ -11,8 +11,8 @@ class ParametroLectura extends Model
 
     protected $table        = 'PARAMETROLECTURA';
     protected $primaryKey   = 'ParametroLectura';
-    protected $fillable     = ['GenerarFacturaCelularServidor', 'MesesDePromedio', 'MesesNuevo', 'DiasDeInstalacion', 'EjemploFinDeCiclo', 'EjemploVolcado', 
+    protected $fillable     = ['GenerarFacturaCelularServidor', 'MesesDePromedio', 'MesesNuevo', 'DiasDeInstalacion', 'EjemploFinDeCiclo', 'EjemploVolcado', 'AnormalidadCambioMedidor',
                             'EjemploVolcado2', 'FinMedidorInformacion', 'ConsumoMaximo', 'AnormalidadPendiente', 'AnormalidadEstimado', 'AnormalidadIrreal', 'AnormalidadVerificarCategoria',
-                            'AnormalidadNuevo', 'EsperaParaGeneracion', 'TipoAviso', 'DeudaAcumuladoConsumoActual', 'ParametroLecturaEstadoConHistorico', 'ImprimirLecturador'];
+                'AnormalidadNuevo', 'EsperaParaGeneracion', 'TipoAviso', 'DeudaAcumuladoConsumoActual', 'ParametroLecturaEstadoConHistorico', 'ImprimirLecturador', 'AnormalidadRegularizacionBajaTemporal'];
     public $timestamps      = false;
 }

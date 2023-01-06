@@ -66,6 +66,9 @@ class GeneracionLecturaController extends Controller
         if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
         else $loGeneracionLectura['Categorizar'] = false;
 
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $loGeneracionLectura['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $loGeneracionLectura['Pendiente'] = false;
+
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
         return response()->json($loPaquete);
@@ -103,6 +106,9 @@ class GeneracionLecturaController extends Controller
         if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
         else $loGeneracionLectura['Categorizar'] = false;
 
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $loGeneracionLectura['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $loGeneracionLectura['Pendiente'] = false;
+
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
         return response()->json($loPaquete);
@@ -115,36 +121,6 @@ class GeneracionLecturaController extends Controller
         $lcTipoDato          = $request->input('tipo');
 
         switch ($lcTipoDato) {
-            case 'Nombre':
-                $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
-                ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2')
-                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura')
-                ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
-                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad')
-                ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo')
-                ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
-                ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
-                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')
-                ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
-                ->where('CLIENTE.Nombre', 'like', '%'.$lnBuscar.'%')
-                ->get();
-
-                if(count($generacionLectura) == 0){
-                    $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
-                    ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte')
-                    ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
-                    ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-                    ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
-                    ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
-                    ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
-                    ->where('CLIENTE.Nombre', 'like', '%'.$lnBuscar.'%')
-                    ->get();
-                }
-                break;
-
             case 'Codigo':
                 $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
                 ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
@@ -204,41 +180,20 @@ class GeneracionLecturaController extends Controller
                     ->get();
                 }
                 break;
-
-            case 'UbicacionOtro':
-                $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
-                ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2')
-                ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura')
-                ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
-                ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad')
-                ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-                ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo')
-                ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
-                ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
-
-                ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')
-                ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
-                ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '%'.$lnBuscar.'%')
-                ->get();
-
-                if(count($generacionLectura) == 0){
-                    $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
-                    ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte')
-                    ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
-                    ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
-                    ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
-                    ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
-                    ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
-                    ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '%'.$lnBuscar.'%')
-                    ->get();
-                }
-                break;
         }
+
+        $array = [];
+
+        if(isset($generacionLectura[0]->MedidorAnormalidad2)) $array['Categorizar'] = $this->BuscarAnormalidadCategorizar($generacionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $array['Categorizar'] = false;
+
+        if(isset($generacionLectura[0]->MedidorAnormalidad)) $array['Pendiente'] = $this->BuscarAnormalidadPendiente($generacionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $array['Pendiente'] = false;
+
+        $array['GeneracionLectura'] = $generacionLectura;
         
         $loPaquete = new mPaqueteTodoFacil();
-        $loPaquete->values = $generacionLectura;
+        $loPaquete->values = $array;
         return response()->json($loPaquete);
     }
 
@@ -327,6 +282,13 @@ class GeneracionLecturaController extends Controller
         $loPaquete->values = $generacionLectura;
         return response()->json($loPaquete);
     }
+
+    public function AnormalidadesEspeciales($DataBaseAlias){
+        $loParametroLectura = ParametroLectura::on($DataBaseAlias)
+            ->select('AnormalidadNuevo', 'AnormalidadCambioMedidor', 'AnormalidadRegularizacionBajaTemporal')
+            ->get();
+        return $loParametroLectura;
+    }
      /**
      * Metodo que devuelve una de CLIENTE que se van a Lecturar
      * @method      listarLecturas()
@@ -340,6 +302,8 @@ class GeneracionLecturaController extends Controller
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
         $lnBuscar            = $request->input('dato');
         $lcTipoDato          = $request->input('tipo');
+
+        $anormalidades = $this->AnormalidadesEspeciales($lnDataBaseAlias);
 
         switch ($lcTipoDato) {
             case 'Nombre':
@@ -358,7 +322,9 @@ class GeneracionLecturaController extends Controller
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                 ->where('GENERACIONLECTURA.LecturaActual', '=', '0')
                 ->where('GENERACIONLECTURA.Consumo', '=', '0')
-                ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                // ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                ->whereIn('GENERACIONLECTURA.MedidorAnormalidad', [0, $anormalidades[0]->AnormalidadNuevo,
+                    $anormalidades[0]->AnormalidadCambioMedidor, $anormalidades[0]->AnormalidadRegularizacionBajaTemporal])
                 ->where('CLIENTE.Nombre', 'like', '%'.$lnBuscar.'%')
                 ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
                 ->paginate(10);
@@ -380,7 +346,9 @@ class GeneracionLecturaController extends Controller
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                 ->where('GENERACIONLECTURA.LecturaActual', '=', '0')
                 ->where('GENERACIONLECTURA.Consumo', '=', '0')
-                ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                // ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                ->whereIn('GENERACIONLECTURA.MedidorAnormalidad', [0, $anormalidades[0]->AnormalidadNuevo,
+                    $anormalidades[0]->AnormalidadCambioMedidor, $anormalidades[0]->AnormalidadRegularizacionBajaTemporal])
                 ->where('GENERACIONLECTURA.Cliente', '=', $lnBuscar)
                 ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
                 ->paginate(10);
@@ -402,7 +370,9 @@ class GeneracionLecturaController extends Controller
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                 ->where('GENERACIONLECTURA.LecturaActual', '=', '0')
                 ->where('GENERACIONLECTURA.Consumo', '=', '0')
-                ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                // ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                ->whereIn('GENERACIONLECTURA.MedidorAnormalidad', [0, $anormalidades[0]->AnormalidadNuevo,
+                    $anormalidades[0]->AnormalidadCambioMedidor, $anormalidades[0]->AnormalidadRegularizacionBajaTemporal])
                 ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '____'.$lnBuscar.'%')
                 ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
                 ->paginate(10);
@@ -424,7 +394,9 @@ class GeneracionLecturaController extends Controller
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                 ->where('GENERACIONLECTURA.LecturaActual', '=', '0')
                 ->where('GENERACIONLECTURA.Consumo', '=', '0')
-                ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                // ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+                ->whereIn('GENERACIONLECTURA.MedidorAnormalidad', [0, $anormalidades[0]->AnormalidadNuevo,
+                    $anormalidades[0]->AnormalidadCambioMedidor, $anormalidades[0]->AnormalidadRegularizacionBajaTemporal])
                 ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '%'.$lnBuscar.'%')
                 ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')
                 ->paginate(10);
@@ -623,6 +595,9 @@ class GeneracionLecturaController extends Controller
 
         if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
         else $loGeneracionLectura['Categorizar'] = false;
+
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $loGeneracionLectura['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $loGeneracionLectura['Pendiente'] = false;
         
         $loPaquete = new mPaqueteTodoFacil();
         $loPaquete->values = $loGeneracionLectura;
@@ -636,14 +611,24 @@ class GeneracionLecturaController extends Controller
         return $loCategoria;
     }
 
+    public function BuscarAnormalidadPendiente($Anormalidad, $lnDataBaseAlias){
+        $loPendiente = ParametroLectura::on($lnDataBaseAlias)->where('AnormalidadPendiente', '=', $Anormalidad)->get();
+        $loPendiente = isset($loPendiente[0]->AnormalidadPendiente) ? true : false;
+
+        return $loPendiente;
+    }
+
     public function verLecturaId(Request $request){
         $lnDataBaseAlias     = $request->DataBaseAlias;
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
         $lnCliente           = $request->input('tcCliente');
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre as NombreTC')
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
         ->where('GENERACIONLECTURA.Cliente', '=', $lnCliente)
         ->get();
@@ -666,12 +651,19 @@ class GeneracionLecturaController extends Controller
         $lnCodigpUbicacion   = $request->CodigoUbicacion;
         $lnGeneracionFactura = $request->input('tcGeneracionFactura');
 
+        $anormalidades = $this->AnormalidadesEspeciales($lnDataBaseAlias);
+
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
+        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre as NombreTC')
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
+        ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
         ->where('GENERACIONLECTURA.LecturaActual', '=', 0)
         ->where('GENERACIONLECTURA.Consumo', '=', 0)
-        ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+        // ->where('GENERACIONLECTURA.MedidorAnormalidad', '=', '0')
+        ->whereIn('GENERACIONLECTURA.MedidorAnormalidad', [0, $anormalidades[0]->AnormalidadNuevo,
+            $anormalidades[0]->AnormalidadCambioMedidor, $anormalidades[0]->AnormalidadRegularizacionBajaTemporal])
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
         ->having('GENERACIONLECTURA.CodigoUbicacion', '>', $lnCodigpUbicacion)
         ->orderBy('GENERACIONLECTURA.CodigoUbicacion', 'ASC')

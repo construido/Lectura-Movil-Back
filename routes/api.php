@@ -54,10 +54,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     // RUTAS DE LA TABLA GENERACIONFACTURA DE LA BASE DE DATOS LECTURA MOVIL
     Route::post('/listarPlanillaDeLecturasPendientes', [GeneracionFacturaController::class, 'listarPlanillaDeLecturasPendientes']);
     Route::post('/listarPlanillaDeLecturasProcesadas', [GeneracionFacturaController::class, 'listarPlanillaDeLecturasProcesadas']);
+    Route::post('/listarTodasLasPlanilla', [GeneracionFacturaController::class, 'listarTodasLasPlanilla']);
 
     // RUTAS DE LA TABLA MEDIDORANORMALIDAD DE LA BASE DE DATOS LECTURA MOVIL
     Route::post('/llenarSelectAnormalidad', [MedidorAnormalidadController::class, 'llenarSelectAnormalidad']);
     Route::post('/AnormalidadesDeMedidor', [MedidorAnormalidadController::class, 'AnormalidadesDeMedidor']);
+    Route::post('/LecturaPendiente', [MedidorAnormalidadController::class, 'LecturaPendiente']);
     Route::post('/Categorizar', [MedidorAnormalidadController::class, 'Categorizar']);
 
     // RUTAS PARA EL ENVIO DE DATOS A LA DB´s DE LAS EMPRESAS
