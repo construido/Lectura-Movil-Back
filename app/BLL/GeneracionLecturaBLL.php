@@ -245,17 +245,144 @@ class GeneracionLecturaBLL{
                     }
                 }
             }else {
-                $this->gnConsumoFacturado = $this->gnConsumoActual;
+                $this->gnConsumoFacturado = $this->gnMedia;
                 $lnResult = $this->EsCasoSinLectura_AplicarPromedio($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->gnLecturaAnterior, 
                     $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnConsumoFacturado, $tnConsumoMinimo); // TODO
-                    
+                
+                if($lnResult != 0) {
+                    $this->gnConsumoFacturado = $this->gnConsumoActual;
+                }
+                
                 if($lnResult == 3 || $lnResult == 2){
                     $lnResult = $this->AnormalidadCorrecta($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->MedidorInfo->MedidorTipoComportamiento);
                 }
             }
-            // GuardarErrores::GuardarLog(0, "ValidarLectura()", $lnResult, 0, 0);
             return $lnResult;
         }
+
+        // public function PostValidacion(){
+        //     $lnEsInstalacionNueva = GeneracionLectura::esInstalacionNueva($this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro);
+        //     if($lnEsInstalacionNueva){ //IF INLIST(lnEsInstalacionNueva, 0, 1)
+        //         $lnId_MediEst = $ID_Nuevo; //pGlobal.ID_Nuevo
+        //         AplicarRegla($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor); //THISFORM.oGenLect.AplicarRegla(lnLectAnt, lnLectAct, lnConsumo, lnMedia, $lnId_MediEst, lnId_Medidor)			
+        //         // lcError = THISFORM.oGenLect.GetErrorMsgBy(8) &&Parametro: 8 = APLICAR INSTALACION NUEVA
+        //         // SELECT TEMPORAL //TODO
+        //         // REPLACE TEMPORAL.LectAnt WITH THISFORM.oGenLect.nLectAnt //TODO
+        //         // REPLACE TEMPORAL.LectAct WITH THISFORM.oGenLect.nLectAct //TODO
+        //         // REPLACE TEMPORAL.Consumo WITH THISFORM.oGenLect.nConsumo //TODO
+        //         // REPLACE TEMPORAL.ConsumoFac WITH THISFORM.oGenLect.nConsumoFac //TODO
+        //         // REPLACE TEMPORAL.ID_MediEst WITH $lnId_MediEst && Se colocar de Forma Predeterminada 			
+        //         // REPLACE TEMPORAL.Variacion WITH THISFORM.oGenLect.nPorcentajeDesviacion //TODO
+        //         // REPLACE TEMPORAL.Error WITH  lcError
+        //     }else{
+        //         $lnEsCambioMedidor = GeneracionLectura::EsCambioDeMedidor($this->gnMedidorAnormalidad, $this->gnCliente);
+        //         SELECT TEMPORAL
+        //         IF !EMPTY(lcErrorEstado)
+        //             REPLACE TEMPORAL.Error WITH lcErrorEstado
+        //         ENDIF
+        //         IF INLIST(lnEsCambioMedidor, 0, 1)
+        //             THISFORM.oGenLect.AplicarRegla(lnLectAnt, lnLectAct, lnConsumo, lnMedia, $lnId_MediEst, lnId_Medidor)			
+        //             lcError = THISFORM.oGenLect.GetErrorMsgBy(9) &&Parametro: 8 = APLICAR INSTALACION NUEVA
+        //             SELECT TEMPORAL
+        //             REPLACE TEMPORAL.LectAnt WITH THISFORM.oGenLect.nLectAnt
+        //             REPLACE TEMPORAL.LectAct WITH THISFORM.oGenLect.nLectAct
+        //             REPLACE TEMPORAL.Consumo WITH THISFORM.oGenLect.nConsumo
+        //             REPLACE TEMPORAL.ConsumoFac WITH THISFORM.oGenLect.nConsumoFac
+        //             *REPLACE TEMPORAL.ID_MediEst WITH $lnId_MediEst && Se colocar de Forma Predeterminada 			
+        //             REPLACE TEMPORAL.Variacion WITH THISFORM.oGenLect.nPorcentajeDesviacion
+        //             IF(lnEsCambioMedidor = 0)
+        //                 REPLACE TEMPORAL.Error WITH  lcError
+        //             ENDIF
+        //         ELSE
+        //             lnEsRegulaBajaTemporal=THISFORM.oGenLect.EsRegularizacionBajaTemporal($lnId_MediEst, lnID_Socio, @lcErrorEstado)
+        //             SELECT TEMPORAL
+        //             IF !EMPTY(lcErrorEstado)
+        //                 REPLACE TEMPORAL.Error WITH lcErrorEstado
+        //             ENDIF
+        //             IF INLIST(lnEsRegulaBajaTemporal, 0, 1)
+        //                 THISFORM.oGenLect.AplicarRegla(lnLectAnt, lnLectAct, lnConsumo, lnMedia, $lnId_MediEst, lnId_Medidor)			
+        //                 lcError = THISFORM.oGenLect.GetErrorMsgBy(10) &&Parametro: 8 = APLICAR INSTALACION NUEVA
+        //                 SELECT TEMPORAL
+        //                 REPLACE TEMPORAL.LectAnt WITH THISFORM.oGenLect.nLectAnt
+        //                 REPLACE TEMPORAL.LectAct WITH THISFORM.oGenLect.nLectAct
+        //                 REPLACE TEMPORAL.Consumo WITH THISFORM.oGenLect.nConsumo
+        //                 REPLACE TEMPORAL.ConsumoFac WITH THISFORM.oGenLect.nConsumoFac
+        //                 *REPLACE TEMPORAL.ID_MediEst WITH $lnId_MediEst && Se colocar de Forma Predeterminada 			
+        //                 REPLACE TEMPORAL.Variacion WITH THISFORM.oGenLect.nPorcentajeDesviacion
+        //                 IF(lnEsRegulaBajaTemporal = 0)
+        //                     REPLACE TEMPORAL.Error WITH  lcError
+        //                 ENDIF
+        //             ELSE
+        //                 IF (llSeValida = .F.) 
+        //                     lcTipoConsumoNombre = THISFORM.oGenLect.oMedidorInfo.GetTipoConsumo(THISFORM.oGenLect.nTipoConsumo)	
+        //                     IF(THISFORM.MostrarConsumoMenorFactorMinimo.Value = .T.)
+        //                         lcError = "[Informativo][" + lcTipoConsumoNombre + "]"
+        //                     ELSE
+        //                         lcError = ""
+        //                     ENDIF
+        //                     IF(lnValido = 0)
+        //                         lcError = ""
+        //                     ENDIF 
+        //                     SELECT TEMPORAL
+        //                     REPLACE TEMPORAL.Error WITH  lcError
+        //                 ENDIF
+        
+        //                 IF (TEMPORAL.CONSUMO <= 0 OR TEMPORAL.CONSUMOFAC = 0 ) AND TEMPORAL.ID_MEDIEST = 0
+        //                     THISFORM.oGenLect.AplicarRegla(lnLectAnt, lnLectAct, lnConsumo, lnMedia, $lnId_MediEst, lnId_Medidor)
+        //                     SELECT TEMPORAL
+        //                     REPLACE TEMPORAL.LectAnt WITH THISFORM.oGenLect.nLectAnt		
+        //                     REPLACE TEMPORAL.LectAct WITH THISFORM.oGenLect.nLectAct
+        //                     IF THISFORM.oGenLect.nLectAct > 0
+        //                         REPLACE TEMPORAL.Consumo WITH THISFORM.oGenLect.nConsumo
+        //                     ELSE
+        //                         REPLACE TEMPORAL.Consumo WITH IIF(THISFORM.oGenLect.nConsumo < 0, 0, THISFORM.oGenLect.nConsumo) 
+        //                     ENDIF 
+        //                     &&REPLACE TEMPORAL.Consumo WITH THISFORM.oGenLect.nConsumo					
+        //                     REPLACE TEMPORAL.ConsumoFac WITH IIF(THISFORM.oGenLect.nConsumoFac < 0, 0, THISFORM.oGenLect.nConsumoFac) 
+                            
+        //                     // &&VERIFICAMOS SI EL CONSUMOFAC ES MENOR QUE EL CONSUMOMINIMO}, By: ASF, Fecha: 04-11-2022
+        //                     IF USED("CATEGORI")		
+        //                         lnArea2 = SELECT()
+        //                         SELECT CATEGORI
+        //                         SEEK TEMPORAL.ID_CATEG
+        //                         IF FOUND()
+        //                             IF (CATEGORI.ConsumoMin > 0) AND (TEMPORAL.ConsumoFac < CATEGORI.ConsumoMin)
+        //                                 REPLACE TEMPORAL.ConsumoFac WITH CATEGORI.ConsumoMin
+        //                             ENDIF 
+        //                         ENDIF 
+        //                         SELECT(lnArea2) 
+        //                     ENDIF 
+        //                 ELSE
+        //                     THISFORM.oGenLect.AplicarRegla(lnLectAnt, lnLectAct, lnConsumo, lnMedia, $lnId_MediEst, lnId_Medidor)				
+        //                     SELECT TEMPORAL
+        //                     REPLACE TEMPORAL.LectAct WITH THISFORM.oGenLect.nLectAct
+        //                     REPLACE TEMPORAL.Consumo WITH IIF(THISFORM.oGenLect.nConsumo < 0, 0, THISFORM.oGenLect.nConsumo)
+        //                     REPLACE TEMPORAL.ConsumoFac WITH IIF(THISFORM.oGenLect.nConsumoFac < 0, lnMedia, THISFORM.oGenLect.nConsumoFac)
+                            
+        //                     // &&VERIFICAMOS SI EL CONSUMOFAC ES MENOR QUE EL CONSUMOMINIMO}, By: ASF, Fecha: 04-11-2022
+        //                     IF USED("CATEGORI")		
+        //                         lnArea2 = SELECT()
+        //                         SELECT CATEGORI
+        //                         SEEK TEMPORAL.ID_CATEG
+        //                         IF FOUND()
+        //                             IF (CATEGORI.ConsumoMin > 0) AND (TEMPORAL.ConsumoFac < CATEGORI.ConsumoMin)
+        //                                 &&SET STEP ON 
+        //                                 REPLACE TEMPORAL.ConsumoFac WITH CATEGORI.ConsumoMin
+        //                             ENDIF 
+        //                         ENDIF
+        //                         SELECT(lnArea2) 
+        //                     ENDIF 
+        //                 ENDIF
+        //                 REPLACE TEMPORAL.Variacion WITH THISFORM.oGenLect.nPorcentajeDesviacion
+        //             ENDIF
+        //         ENDIF
+        //     }
+        //     IF(THISFORM.MostrarMedidorInfoAlValidar.Value = .T.)
+        //         lcMsg = THISFORM.oGenLect.oMedidorInfo.ToString()
+        //         MESSAGEBOX( lcMsg, 0, "Aviso")
+        //     ENDIF
+        //     return 1 //&& Salimos sin restricciones.
+        // }
 
         public function EsCasoSinLectura_AplicarPromedio($tnMedidorAnormalidad, $tnTipoConsumo, $tnLecturaAnterior, $tnLecturaActual, $tnConsumoActual, $tnMedia, $tnConsumoFacturado, $tnConsumoMinimo){
 
@@ -275,11 +402,12 @@ class GeneracionLecturaBLL{
 
                 if(($tnLecturaActual == $tnLecturaAnterior) && ($tnConsumoActual == 0)){
                     if(($lnTipoConsumoSistema == $this->TipoConsumo->SinLectura) && (/*$lnRegla*/$this->Regla == $this->ReglaLecturacion->CONSUMO_PROMEDIO)){
-                        if(($tnConsumoMinimo > 0) && ($tnConsumoFacturado <= $tnConsumoMinimo) && ($tnMedia <= $tnConsumoMinimo)){
+                        if(($tnConsumoMinimo[0]->ConsumoMinimo > 0) && ($tnConsumoFacturado <= $tnConsumoMinimo[0]->ConsumoMinimo) && ($tnMedia <= $tnConsumoMinimo[0]->ConsumoMinimo)){
                             $lnResult = 0;
-                        }else if($lnConsumoFacturado <> $tnMedia){
+                        }else if($tnConsumoFacturado <> $tnMedia){
                             $lnResult = 4;
-                            $lnMessageError = "ConsumoFacturado Inválido";
+                            $lnMessageError = "ConsumoFacturado Inválido,  tnConsumoFacturado:".$tnConsumoFacturado." tnMedia:".$tnMedia;
+                            GuardarErrores::GuardarLog(0, "EsCasoSinLectura_AplicarPromedio()", json_encode($lnMessageError), 'Linea 405', 0);
                         }else{
                             $lnResult = 0;
                         }
