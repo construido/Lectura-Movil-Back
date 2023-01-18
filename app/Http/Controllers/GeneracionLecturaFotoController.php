@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Exception;
 use App\Models\GeneracionLecturaFoto;
 
 class GeneracionLecturaFotoController extends Controller
@@ -32,8 +33,31 @@ class GeneracionLecturaFotoController extends Controller
             }
 
             return 1;
-        } catch (\Throwable $th) {
+        } catch (Exception $th) {
             return 0;
+        }
+    }
+
+    public function imagenAllClient(Request $request)
+    {
+        try {
+            $image = GeneracionLecturaFoto::on($request->DataBaseAlias)
+                ->where('GeneracionFactura', $request->GeneracionFactura)
+                ->where('Cliente', $request->Cliente)
+                ->get();
+
+            $host = $_SERVER["HTTP_HOST"];
+            $path = "http://".$host;
+            $array = [];
+            if(count($image)){
+                for ($i = 0; $i < count($image); $i++) {
+                    array_push($array, ($path."/".$image[$i]->Foto));
+                }
+            }
+
+            return $array;
+        } catch (Exception $th) {
+            return $th;
         }
     }
 }

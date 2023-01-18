@@ -10,6 +10,7 @@ use App\Models\GeneracionLectura;
 use App\Models\ParametroLectura;
 
 use App\Modelos\mPaqueteTodoFacil;
+use App\Modelos\GuardarErrores;
 
 use App\BLL\GeneracionLecturaBLL;
 use App\BLL\LecturaMovilRestNET;
@@ -103,14 +104,18 @@ class GeneracionLecturaController extends Controller
         ->limit('1')
         ->get();
 
-        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
-        else $loGeneracionLectura['Categorizar'] = false;
+        $array = [];
 
-        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $loGeneracionLectura['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
-        else $loGeneracionLectura['Pendiente'] = false;
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $array['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $array['Categorizar'] = false;
+
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $array['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $array['Pendiente'] = false;
+
+        $array['GeneracionLectura'] = $loGeneracionLectura;
 
         $loPaquete = new mPaqueteTodoFacil();
-        $loPaquete->values = $loGeneracionLectura;
+        $loPaquete->values = $array;
         return response()->json($loPaquete);
     }
 
@@ -702,11 +707,17 @@ class GeneracionLecturaController extends Controller
         ->limit('1')
         ->get();
 
-        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $loGeneracionLectura['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
-        else $loGeneracionLectura['Categorizar'] = false;
+        $array = [];
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad2)) $array['Categorizar'] = $this->BuscarAnormalidadCategorizar($loGeneracionLectura[0]->MedidorAnormalidad2, $lnDataBaseAlias);
+        else $array['Categorizar'] = false;
+
+        if(isset($loGeneracionLectura[0]->MedidorAnormalidad)) $array['Pendiente'] = $this->BuscarAnormalidadPendiente($loGeneracionLectura[0]->MedidorAnormalidad, $lnDataBaseAlias);
+        else $array['Pendiente'] = false;
+
+        $array['GeneracionLectura'] = $loGeneracionLectura;
 
         $loPaquete = new mPaqueteTodoFacil();
-        $loPaquete->values = $loGeneracionLectura;
+        $loPaquete->values = $array;
         return response()->json($loPaquete);
     }
 
@@ -804,6 +815,7 @@ class GeneracionLecturaController extends Controller
         $laGeneracionLectura['llNuevaLectura']       = $request->input('llNuevaLectura');
         $laGeneracionLectura['DataBaseAlias']        = $request->input('DataBaseAlias');
         $laGeneracionLectura['tnPlomero']            = $request->input('tnPlomero');
+        $laGeneracionLectura['tnGlosa']              = $request->input('tnGlosa');
 
         $SocioConMedidor = $this->DO_CargarMedidorYConsumoAsignado($request->tnCliente, $request->DataBaseAlias);
 

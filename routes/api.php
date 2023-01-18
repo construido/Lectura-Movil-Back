@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GeneracionLecturaFotoController;
 use App\Http\Controllers\MedidorAnormalidadController;
 use App\Http\Controllers\GeneracionFacturaController;
 use App\Http\Controllers\GeneracionLecturaController;
@@ -75,6 +76,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
 
     // RUTA PARA LA TABLA MARCAMEDIDOR
     Route::post('/llenarSelectMarca', [MarcaMedidorController::class,'llenarSelectMarca']);
+
+    // RUTA PARA LA TABLA GENERACIONLECTURAFOTO
+    Route::post('/imagenAllClient', [GeneracionLecturaFotoController::class,'imagenAllClient']);
 });
 
 //----------------------------------------------------------------------//
