@@ -61,6 +61,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){
     Route::post('/llenarSelectAnormalidad', [MedidorAnormalidadController::class, 'llenarSelectAnormalidad']);
     Route::post('/AnormalidadesDeMedidor', [MedidorAnormalidadController::class, 'AnormalidadesDeMedidor']);
     Route::post('/LecturaPendiente', [MedidorAnormalidadController::class, 'LecturaPendiente']);
+    Route::get('/parametroLectura', [MedidorAnormalidadController::class, 'parametroLectura']);
     Route::post('/Categorizar', [MedidorAnormalidadController::class, 'Categorizar']);
 
     // RUTAS PARA EL ENVIO DE DATOS A LA DB´s DE LAS EMPRESAS

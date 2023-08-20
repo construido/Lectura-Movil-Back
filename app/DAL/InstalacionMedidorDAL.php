@@ -35,4 +35,13 @@ class InstalacionMedidorDAL
 
         return $loInstalacionNueva;
     }
+
+    public function obtenerCliente($Cliente, $DataBaseAlias){
+        // lcSQL = " SELECT I.* " +;
+        // "   FROM _INSTALAM2 I " +;
+        // "  WHERE I.ID_Socio = " + oMySQL.FOX2SQL(tnID_Socio)
+        $loInstalacionNueva = InstalacionMedidor::on($DataBaseAlias)->where('Cliente', $Cliente)->get();
+
+        return $loInstalacionNueva;
+    }
 }

@@ -268,15 +268,18 @@ class GeneracionLecturaBLL{
             return $lnResult;
         }
 
+        // TOOD: Implementado el 20/8/2023
         public function PostValidacion(){
-            $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro);
+            // TOD: Se le aumentó $this->gnGeneracionFactura y $this->DataBaseAlias
+            $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro, $this->DataBaseAlias);
             if($this->oAnormalidadCorrectaBLL->cError != ""){
                 $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->cError;
             }
 
             if(($lnEsInstalacionNueva == 0) || ($lnEsInstalacionNueva == 1)){
-                $lnId_MediEst = $ID_Nuevo; //pGlobal.ID_Nuevo
-                AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                // $lnId_MediEst = $ID_Nuevo; //pGlobal.ID_Nuevo
+                // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                 $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(8);
 
                 if($lnEsInstalacionNueva == 0){
@@ -284,13 +287,14 @@ class GeneracionLecturaBLL{
                     $this->cMessage = $lcErrorEsInstalacionNueva;
                 }
             }else{
-                $lnEsCambioMedidor = $this->oAnormalidadCorrectaBLL->EsCambioDeMedidor($this->gnMedidorAnormalidad, $this->gnCliente);
+                $lnEsCambioMedidor = $this->oAnormalidadCorrectaBLL->EsCambioDeMedidor($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                 if($this->oAnormalidadCorrectaBLL->cError == ""){
                     $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->cError;
                 }
 
                 if(($lnEsCambioMedidor == 0) || ($lnEsCambioMedidor == 1)){
-                    AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                    // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                    AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                     $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(9);
 
                     if($lnEsInstalacionNueva == 0){
@@ -298,13 +302,14 @@ class GeneracionLecturaBLL{
                         $this->cMessage = $lcErrorEsCambioMedidor;
                     }
                 }else{
-                    $lnEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->EsRegularizacionBajaTemporal($this->gnMedidorAnormalidad, $this->gnCliente);
+                    $lnEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->EsRegularizacionBajaTemporal($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                     if($this->oAnormalidadCorrectaBLL->cError == ""){
                         $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->cError;
                     }
 
                     if(($lnEsRegulaBajaTemporal == 0) || ($lnEsRegulaBajaTemporal == 1)){
-                        AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);	
+                        // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                        AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                         $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(10);
 
                         if($lnEsInstalacionNueva == 0){
@@ -321,7 +326,8 @@ class GeneracionLecturaBLL{
                         }
 
                         if(($Consumo <= 0 || $ConsumoFacturado == 0) && $MedidorAnormalidad == 0){
-                            AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
 
                             if($nLectAct > 0) 
                                 $Consumo = $nConsumo;
@@ -329,7 +335,8 @@ class GeneracionLecturaBLL{
                                 // REPLACE TEMPORAL.Consumo WITH IIF(THISFORM.oGenLect.nConsumo < 0, 0, THISFORM.oGenLect.nConsumo)
 
                         }else{
-                            AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                         }
                     }
                 }
@@ -352,68 +359,49 @@ class GeneracionLecturaBLL{
         //     }
         // }
 
-        public function AplicarRegla2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $tnId_MediEst, $tnId_Medidor){
+        // TOOD: Implementado el 20/8/2023
+        public function AplicarRegla2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $DataBaseAlias){
+            $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
             $this->verificarConsumoFacturado();
-            // FUNCTION AplicarRegla(tnLectAnt AS Integer, tnLectAct AS Integer, tnConsumo AS Integer,;
-            //             tnMedia AS Integer, tnId_MediEst AS Integer, tnId_Medidor AS Integer)
-            // &&BEGIN
-            // LOCAL loEx AS Exception
-            // LOCAL lcLog, lnArea, lcSQL, lnReglaAAplicar
-            // TRY
-            // THIS.ErrorMsg = ""
-            // lcSQL = "SELECT * FROM MEDIDOR WHERE ID_MEDIDOR = " + oMySQL.Fox2SQL(tnId_Medidor)
-            // oMySQL.Ejecutar(lcSQL, "MEDIDOR_", THIS.DataSession)
-            // IF RECCOUNT("MEDIDOR_") > 0
-            // THIS.nFinMedidor = MEDIDOR_.FINMEDIDOR
-            // ELSE
-            // THIS.nFinMedidor = 0
-            // ENDIF
-            // lnReglaAAplicar = THIS.Get_TipoReglaAAplicar(tnId_MediEst)
-            // IF  (tnId_MediEst = 0)
-            // THIS.ReglaNombre = "APLICAR LECTURA ACTUAL" 
-            // THIS.Aplicar_ConsumoNormal(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            // ELSE
-            //     DO CASE &&Falta relacionar con la Clase:ReglaLectura.[REGLA]
-            //     CASE lnReglaAAplicar = 1
-            //         THIS.ReglaNombre = "APLICAR LECTURA PENDIENTE"
-            //         THIS.Aplicar_LecturaPendiente(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 2
-            //         THIS.ReglaNombre = "APLICAR LECTURA ACTUAL" 
-            //         THIS.Aplicar_LecturaActual(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 3
-            //         THIS.ReglaNombre = "APLICAR FIN DE CICLO"
-            //         THIS.Aplicar_FinDeCiclo(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 4
-            //         THIS.ReglaNombre = "APLICAR CONSUMO PROMEDIO"
-            //         THIS.Aplicar_ConsumoPromedio(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 5
-            //         THIS.ReglaNombre = "APLICAR MEDIDOR VOLCADO"
-            //         THIS.Aplicar_MedidorVolcado(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 6
-            //         THIS.ReglaNombre = "APLICAR CONSUMO ASIGNADO"
-            //         THIS.Aplicar_ConsumoAsignado(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 7
-            //         THIS.ReglaNombre = "APLICAR AJUSTE LECTURA"
-            //         &&THIS.Aplicar_AjusteLectura(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 8
-            //         THIS.ReglaNombre = "APLICAR INSTALACION NUEVA"
-            //         THIS.Aplicar_InstalacionNueva(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 9
-            //         THIS.ReglaNombre = "APLICAR CAMBIO DE MEDIDOR"
-            //         THIS.Aplicar_CambioDeMedidor(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            //     CASE lnReglaAAplicar = 10
-            //         THIS.ReglaNombre = "APLICAR REGULARIZACION BAJA TEMPORAL"
-            //         THIS.Aplicar_RegularizacionBajaTemporal(tnLectAnt, tnLectAct, tnConsumo, tnMedia, tnId_MediEst, tnId_Medidor)
-            // ENDCASE
-            // ENDIF
-            // CATCH TO loEx
-            // THIS.ErrorMsg = loEx.Message
-            // lcLog = "  ProcedureInitial: GenLect.AplicarRegla()"
-            // oError.Guardar(loEx, lcLog)
-            // ENDTRY
-            // RETURN lnReglaAAplicar
-            // ENDFUNC
+
+            $loMedidor = new MedidorDAL;
+            $loMedidor = $loMedidor->GetRecDt($Medidor, $DataBaseAlias);
+            $lnFinMedidor = 0;
+
+            if(count($loMedidor) > 0) {
+                $lnFinMedidor = $loMedidor[0]->FinMedidor;
+            }
+
+            $TipoReglaAplicar = $MedidorAnormalidadDAL->Get_TipoReglaAAplicar($MedidorAnormalidad, $DataBaseAlias);
+
+            if($MedidorAnormalidad == 0){
+                $this->Aplicar_ConsumoNormal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor);
+            }else{
+                switch ($TipoReglaAplicar) {
+                    case 1: $lnResult = $this->Aplicar_LecturaPendiente2(); break;
+                    case 2: $lnResult = $this->Aplicar_LecturaActual2(); break;
+                    case 3: $lnResult = $this->Aplicar_FinDeCiclo2(); break;
+                    case 4: $lnResult = $this->Aplicar_ConsumoPromedio2(); break;
+                    case 5: $lnResult = $this->Aplicar_MedidorVolcado2(); break;
+                    case 6: $lnResult = $this->Aplicar_ConsumoAsignado2(); break;
+                    case 7: $lnResult = $this->Aplicar_AjusteLectura2(); break;
+                    case 8: $lnResult = $this->Aplicar_InstalacionNueva2(); break;
+                    case 9: $lnResult = $this->Aplicar_CambioDeMedidor2(); break;
+                    case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal2(); break;
+                }
+            }
+
+            return $TipoReglaAplicar;
         }
+
+        public function Aplicar_ConsumoNormal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumo = $tnLectAct - $tnLectAnt;
+            $this->gnConsumoFacturado = $this->gnConsumo;
+            $this->gnMedia = $tnMedia;
+        }
+        // TOOD: Implementado el 20/8/2023
 
         public function EsCasoSinLectura_AplicarPromedio($tnMedidorAnormalidad, $tnTipoConsumo, $tnLecturaAnterior, $tnLecturaActual, $tnConsumoActual, $tnMedia, $tnConsumoFacturado, $tnConsumoMinimo){
 
@@ -886,6 +874,8 @@ class GeneracionLecturaBLL{
                     case 6: $lnResult = $this->Aplicar_ConsumoAsignado(); break;
                     case 7: $lnResult = $this->Aplicar_AjusteLectura(); break;
                     case 8: $lnResult = $this->Aplicar_InstalacionNueva(); break;
+                    // case 9: $lnResult = $this->Aplicar_CambioDeMedidor(); break;
+                    // case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal(); break;
                 }
             }
             return $lnResult;

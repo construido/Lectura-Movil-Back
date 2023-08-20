@@ -24,12 +24,21 @@ class HistoricoFacturaDAL
 
     public function GetFechaLecturaAnterior($Cliente, $DataBaseAlias){
         $loHistoricoFactura = HistoricoFactura::on($DataBaseAlias)
-        ->select('FechaLectura')
-        ->where('Cliente', '=', $Cliente)
-        ->orderBy('Factura', 'DESC')
-        ->limit(1)
-        ->get();
+            ->select('FechaLectura')
+            ->where('Cliente', '=', $Cliente)
+            ->orderBy('Factura', 'DESC')
+            ->limit(1)
+            ->get();
 
-    return $loHistoricoFactura;
+        return $loHistoricoFactura;
+    }
+
+    public function historicoFacturaCantidad($Cliente, $Cobro, $DataBaseAlias){
+        $loHistoricoFactura = HistoricoFactura::on($DataBaseAlias)
+        ->select('Cliente', DB::raw('count(*) as Cantidad'))
+        ->where('Cliente', '=', $Cliente)
+        ->where('Cobro', '<=', $Cobro)
+        // ->groupBy('Cliente')
+        ->get();
     }
 }

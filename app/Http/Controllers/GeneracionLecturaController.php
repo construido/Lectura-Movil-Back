@@ -50,9 +50,11 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 
+                'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre : 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
         ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
         ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
@@ -83,9 +85,11 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 
+                'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre : // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
         ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
         ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
@@ -129,13 +133,15 @@ class GeneracionLecturaController extends Controller
             case 'Codigo':
                 $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
                 ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2')
+                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 
+                    'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // 12/8/2023 IMPLEMENTADO POR ELOY
                 ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad')
                 ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo')
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
                 ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
                 ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')
                 ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
@@ -145,10 +151,12 @@ class GeneracionLecturaController extends Controller
                 if(count($generacionLectura) == 0){
                     $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
                     ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte')
+                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
+                        'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla')  // 12/8/2023 IMPLEMENTADO POR ELOY
                     ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                     ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                     ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                    ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
                     ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
                     ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
                     ->where('GENERACIONLECTURA.Cliente', '=', $lnBuscar)
@@ -159,13 +167,15 @@ class GeneracionLecturaController extends Controller
             case 'Ubicacion':
                 $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
                 ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2')
+                    'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 
+                    'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // 12/8/2023 IMPLEMENTADO POR ELOY
                 ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura')
                 ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                 ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad')
                 ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo')
                 ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
                 ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
                 ->whereColumn('GENERACIONLECTURAMOVIL.Cliente', '=', 'GENERACIONLECTURA.Cliente')
                 ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '____'.$lnBuscar.'%')
@@ -175,10 +185,12 @@ class GeneracionLecturaController extends Controller
                 if(count($generacionLectura) == 0){
                     $generacionLectura = GeneracionLectura::on($lnDataBaseAlias)
                     ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad',
-                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte')
+                        'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
+                        'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // 12/8/2023 IMPLEMENTADO POR ELOY
                     ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
                     ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                     ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
+                    ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
                     ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
                     ->where('GENERACIONLECTURA.CodigoUbicacion', 'like', '____'.$lnBuscar.'%')
                     ->where('GENERACIONLECTURA.GeneracionFactura', '=', $lnGeneracionFactura)
@@ -585,9 +597,11 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 
+                'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre : 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
         ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
         ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad
@@ -629,9 +643,11 @@ class GeneracionLecturaController extends Controller
         $lnCliente           = $request->input('tcCliente');
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
-        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre as NombreTC')
+        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad',
+            'TIPOCONSUMO.Nombre as NombreTC', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
         ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
         ->where('GeneracionFactura', '=', $lnGeneracionFactura)
@@ -659,9 +675,11 @@ class GeneracionLecturaController extends Controller
         $anormalidades = $this->AnormalidadesEspeciales($lnDataBaseAlias);
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
-        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'TIPOCONSUMO.Nombre as NombreTC')
+        ->select('GENERACIONLECTURA.*', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte', 'CLIENTE.Nombre', 'MEDIDORANORMALIDAD.NombreAnormalidad', 
+            'TIPOCONSUMO.Nombre as NombreTC', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('MEDIDORANORMALIDAD', 'GENERACIONLECTURA.MedidorAnormalidad', '=', 'MEDIDORANORMALIDAD.MedidorAnormalidad')
         ->leftjoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
         ->where('GENERACIONLECTURA.LecturaActual', '=', 0)
@@ -687,9 +705,11 @@ class GeneracionLecturaController extends Controller
 
         $loGeneracionLectura = GeneracionLectura::on($lnDataBaseAlias)
         ->select('GENERACIONLECTURA.*', 'MEDIDORANORMALIDAD.NombreAnormalidad', 'MEDIDORANORMALIDAD.MedidorAnormalidad', 'CATEGORIA.NombreCategoria', 'CLIENTE.Corte',
-                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2', 'TC2.Nombre as N2') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre
+                'CLIENTE.Nombre', 'TIPOCONSUMO.Nombre as NombreTC', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2','MA2.NombreAnormalidad as NA2',
+                'TC2.Nombre as N2', 'MEDIDOR.NumeroSerie', 'MEDIDOR.Numero', 'MEDIDORANORMALIDAD.Regla') // TODO : se aumento MedidorAnormalidad2 y 'MA2.NombreAnormalidad TC2.Nombre : 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('CLIENTE', 'GENERACIONLECTURA.Cliente', '=', 'CLIENTE.Cliente')
         ->join('CATEGORIA', 'CLIENTE.Categoria', '=', 'CATEGORIA.Categoria')
+        ->leftJoin('MEDIDOR', 'CLIENTE.Medidor', '=', 'MEDIDOR.Medidor') // 12/8/2023 IMPLEMENTADO POR ELOY
         ->join('GENERACIONLECTURAMOVIL', 'GENERACIONLECTURA.GeneracionFactura', '=', 'GENERACIONLECTURAMOVIL.GeneracionFactura') // TODO : se modificó la consulta para la segunda anormalidad
         ->join('MEDIDORANORMALIDAD as MA2', 'GENERACIONLECTURAMOVIL.MedidorAnormalidad2', '=', 'MA2.MedidorAnormalidad') // TODO : se modificó la consulta para el nombre de la segunda anormalidad
         ->leftJoin('TIPOCONSUMO as TC2', 'MA2.TipoConsumo', '=', 'TC2.TipoConsumo') // TODO : se modificó la consulta para el TipoConsumo de la segunda anormalidad

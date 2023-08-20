@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\MedidorAnormalidad;
 use App\Modelos\mPaqueteTodoFacil;
+use App\DAL\ParametroLecturaDAL;
 
 // La primera indica el tipo de variable
 // •	l - Local
@@ -178,5 +179,11 @@ class MedidorAnormalidadController extends Controller
             ->get();
 
         return response()->json($laMedidorAnormalidad);
+    }
+
+    public function parametroLectura(Request $request){ // TODO: implementado el 30/07/2023
+        $result = new ParametroLecturaDAL();
+        $result = $result->GetAlldt(1, $request->DataBaseAlias);
+        return $result;
     }
 }
