@@ -156,6 +156,12 @@ class GeneracionLecturaBLL{
 
         public function ValidarLectura($tcCliente, $tcGeneracionLectura, 
                 $tcLecturaActual, $Consumo, $tcMedidorAnormalidad, $tcMedia, $tnConsumoMinimo){
+
+            echo "Validar Lectura";
+            // $this->nError = $this->PreValidacion();
+            // if($this->nError == 1) return $this->nError;
+            // echo "Pre Validar Lectura";
+
             $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
             $GeneracionLecturaDAL = new GeneracionLecturaDAL;
             $lnLecturaAnteriorDAL = $GeneracionLecturaDAL->GetRecDt2($tcGeneracionLectura, $tcCliente, $this->DataBaseAlias);
@@ -269,7 +275,7 @@ class GeneracionLecturaBLL{
         }
 
         // TOOD: Implementado el 20/8/2023
-        public function PostValidacion(){
+        public function PreValidacion(){
             // TOD: Se le aumentó $this->gnGeneracionFactura y $this->DataBaseAlias
             $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro, $this->DataBaseAlias);
             if($this->oAnormalidadCorrectaBLL->cError != ""){
@@ -280,12 +286,14 @@ class GeneracionLecturaBLL{
                 // $lnId_MediEst = $ID_Nuevo; //pGlobal.ID_Nuevo
                 // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
                 AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
-                $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(8);
+                // $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(8);
 
                 if($lnEsInstalacionNueva == 0){
                     $this->nErrorAdvertencia = 1;
                     $this->cMessage = $lcErrorEsInstalacionNueva;
                 }
+
+                return 1;
             }else{
                 $lnEsCambioMedidor = $this->oAnormalidadCorrectaBLL->EsCambioDeMedidor($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                 if($this->oAnormalidadCorrectaBLL->cError == ""){
@@ -295,12 +303,14 @@ class GeneracionLecturaBLL{
                 if(($lnEsCambioMedidor == 0) || ($lnEsCambioMedidor == 1)){
                     // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
                     AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
-                    $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(9);
+                    // $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(9);
 
                     if($lnEsInstalacionNueva == 0){
                         $this->nErrorAdvertencia = 1;
                         $this->cMessage = $lcErrorEsCambioMedidor;
                     }
+
+                    return 1;
                 }else{
                     $lnEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->EsRegularizacionBajaTemporal($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                     if($this->oAnormalidadCorrectaBLL->cError == ""){
@@ -310,12 +320,14 @@ class GeneracionLecturaBLL{
                     if(($lnEsRegulaBajaTemporal == 0) || ($lnEsRegulaBajaTemporal == 1)){
                         // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
                         AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
-                        $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(10);
+                        // $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(10);
 
                         if($lnEsInstalacionNueva == 0){
                             $this->nErrorAdvertencia = 1;
                             $this->cMessage = $lcErrorEsRegulaBajaTemporal;
                         }
+                        
+                        return 1;
                     }else{
                         if(!$llSeValida){
                             $lcTipoConsumoNombre = GetTipoConsumo($nTipoConsumo);
@@ -346,7 +358,7 @@ class GeneracionLecturaBLL{
                 // lcMsg = THISFORM.oGenLect.oMedidorInfo.ToString()
                 // MESSAGEBOX( lcMsg, 0, "Aviso")
             }
-            return 1; //&& Salimos sin restricciones.
+            return 0; //&& Salimos sin restricciones.
         }
 
         // public function validadConsumoMinimo(){
@@ -378,16 +390,16 @@ class GeneracionLecturaBLL{
                 $this->Aplicar_ConsumoNormal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor);
             }else{
                 switch ($TipoReglaAplicar) {
-                    case 1: $lnResult = $this->Aplicar_LecturaPendiente2(); break;
-                    case 2: $lnResult = $this->Aplicar_LecturaActual2(); break;
-                    case 3: $lnResult = $this->Aplicar_FinDeCiclo2(); break;
-                    case 4: $lnResult = $this->Aplicar_ConsumoPromedio2(); break;
-                    case 5: $lnResult = $this->Aplicar_MedidorVolcado2(); break;
-                    case 6: $lnResult = $this->Aplicar_ConsumoAsignado2(); break;
-                    case 7: $lnResult = $this->Aplicar_AjusteLectura2(); break;
-                    case 8: $lnResult = $this->Aplicar_InstalacionNueva2(); break;
-                    case 9: $lnResult = $this->Aplicar_CambioDeMedidor2(); break;
-                    case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal2(); break;
+                    case 1: $lnResult = $this->Aplicar_LecturaPendiente2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 2: $lnResult = $this->Aplicar_LecturaActual2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 3: $lnResult = $this->Aplicar_FinDeCiclo2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $lnFinMedidor); break;
+                    case 4: $lnResult = $this->Aplicar_ConsumoPromedio2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 5: $lnResult = $this->Aplicar_MedidorVolcado2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $lnFinMedidor); break;
+                    case 6: $lnResult = $this->Aplicar_ConsumoAsignado2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 7: $lnResult = $this->Aplicar_AjusteLectura2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 8: $lnResult = $this->Aplicar_InstalacionNueva2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 9: $lnResult = $this->Aplicar_CambioDeMedidor2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
+                    case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor); break;
                 }
             }
 
@@ -397,9 +409,147 @@ class GeneracionLecturaBLL{
         public function Aplicar_ConsumoNormal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
             $this->gnLecturaActual = $tnLectAct;
             $this->gnLecturaAnterior = $tnLectAnt;
-            $this->gnConsumo = $tnLectAct - $tnLectAnt;
-            $this->gnConsumoFacturado = $this->gnConsumo;
+            $this->gnConsumoActual = $tnLectAct - $tnLectAnt;
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
             $this->gnMedia = $tnMedia;
+
+            // $this->Aplicar_ConsumoNormal();
+        }
+
+        public function Aplicar_LecturaPendiente2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnLecturaActual = 0;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumoActual = 0;
+            $this->gnConsumoFacturado = 0;
+            $this->gnMedia = $tnMedia;
+            
+            // $this->Aplicar_LecturaPendiente();
+        }
+
+        public function Aplicar_LecturaActual2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumoActual = $tnLectAct - $tnLectAnt;
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
+            $this->gnMedia = $tnMedia;
+            
+            // $this->Aplicar_LecturaActual();
+        }
+
+        public function Aplicar_FinDeCiclo2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $FinMedidor){
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnMedia = $tnMedia;
+
+            if($FinMedidor > 0){
+                $lecturaMax = $FinMedidor;
+                $this->gnConsumoActual = ($lecturaMax - $this->gnLecturaAnterior) + $this->gnLecturaActual + 1;
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+            }
+            
+            // $this->Aplicar_FinDeCiclo();
+        }
+
+        public function Aplicar_ConsumoPromedio2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumoActual = 0;
+            $this->gnConsumoFacturado = $tnMedia;
+            $this->gnMedia = $tnMedia;
+            
+            // $this->Aplicar_ConsumoPromedio();
+        }
+
+        public function Aplicar_MedidorVolcado2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $FinMedidor){
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnMedia = $tnMedia;
+
+            $this->gnConsumoActual = $tnLectAnt - $tnLectAct;
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
+
+            if($FinMedidor > 0){
+                $lecturaMax = $FinMedidor;
+                if($this->gnConsumoActual < 0) $this->gnConsumoActual = ($lecturaMax - $this->gnLecturaActual) + $this->gnLecturaAnterior + 1;
+                elseif($this->gnConsumoActual > 0) $this->gnConsumoActual = $tnLectAnt - $tnLectAct;
+            }
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
+            
+            // $this->Aplicar_MedidorVolcado();
+        }
+
+        public function Aplicar_ConsumoAsignado2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnMedia = $tnMedia;
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumoActual = $tnLectAnt - $tnLectAct;
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
+            
+            // $this->Aplicar_ConsumoAsignado();
+        }
+
+        public function Aplicar_AjusteLectura2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){ // TODO: en espera, no hay código en FoxPro
+            $this->gnMedia = $tnMedia;
+            $this->gnLecturaActual = $tnLectAct;
+            $this->gnLecturaAnterior = $tnLectAnt;
+            $this->gnConsumoActual = $tnLectAnt - $tnLectAct;
+            $this->gnConsumoFacturado = $this->gnConsumoActual;
+            
+            // $this->Aplicar_AjusteLectura();
+        }
+
+        public function Aplicar_InstalacionNueva2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnMedia = $tnMedia;
+
+            if($tnLectAct < $tnLectAnt){
+                $this->gnLecturaActual = $tnLectAnt;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = 0;
+                $this->gnConsumoFacturado = 0;
+            } else {
+                $this->gnLecturaActual = $tnLectAct;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = $tnLectAct - $tnLectAnt;
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+            }
+            
+            // $this->Aplicar_InstalacionNueva();
+        }
+
+        public function Aplicar_CambioDeMedidor2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnMedia = $tnMedia;
+
+            if($tnLectAct < $tnLectAnt){
+                $this->gnLecturaActual = $tnLectAnt;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = 0;
+                $this->gnConsumoFacturado = 0;
+            } else {
+                $this->gnLecturaActual = $tnLectAct;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = $tnLectAct - $tnLectAnt;
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+            }
+            
+            // $this->Aplicar_CambioDeMedidor();
+        }
+
+        public function Aplicar_RegularizacionBajaTemporal2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor){
+            $this->gnMedia = $tnMedia;
+
+            if($tnLectAct < $tnLectAnt){
+                $this->gnLecturaActual = $tnLectAnt;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = 0;
+                $this->gnConsumoFacturado = 0;
+            } else {
+                $this->gnLecturaActual = $tnLectAct;
+                $this->gnLecturaAnterior = $tnLectAnt;
+                $this->gnConsumoActual = $tnLectAct - $tnLectAnt;
+                $this->gnConsumoFacturado = $this->gnConsumoActual;
+            }
+            
+            // $this->Aplicar_RegularizacionBajaTemporal();
         }
         // TOOD: Implementado el 20/8/2023
 
