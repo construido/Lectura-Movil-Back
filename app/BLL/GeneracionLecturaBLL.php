@@ -47,8 +47,8 @@ class GeneracionLecturaBLL{
         public $gnCliente, $gnGeneracionFactura, $gnMedidorAnormalidad, $gnLecturaAnterior, $gnLecturaActual, $gnMedidor, $gnTipoConsumo, $gnConsumoFacturado, $nErrorAdvertencia, $nError;
         public $gnConsumoActual, $gnMedia, $gnMediaAnterior, $gnCategoria, $gnAjusteConsumo, $gnAjusteMonto, $gnPorcentajeDesviacion, $llswMedidorVolcadoEnLimiteMAX = false, $ID_Clase = 2000;
         public $AplicarPromedio, $DesviacionSignificativa, $InspeccionRequerido, $Facturado, $ValidoLectura, $gnConsumoMinimo = 0, $Regla = 0, $swProcesadoCliente = false , $cMessage;
-        public $MedidorInfo, $TipoConsumo, $TipoComportamiento, $ReglaLecturacion, $DataBaseAlias, $gnMedidorAnormalidad2; // TODO : se aumento la variable para la segunda anormalidad - $gnMedidorAnormalidad2
-        public $oAnormalidadCorrectaBLL;
+        public $MedidorInfo, $TipoConsumo, $TipoComportamiento, $ReglaLecturacion, $DataBaseAlias, $gnMedidorAnormalidad2, $gnCobro; // TODO : se aumento la variable para la segunda anormalidad - $gnMedidorAnormalidad2
+        public $oAnormalidadCorrectaBLL, $gnAnormalidadEspecial = 0;
 
         function __construct()
         {
@@ -71,7 +71,7 @@ class GeneracionLecturaBLL{
             
                 // 1.- INICIALIZAR CAMPOS
                 $lnResult = $this->InicializarCampos($datos['tcCliente'], $datos['tcGeneracionLectura'], $datos['tcLecturaActual'],
-                    $Consumo, $datos['tcMedidorAnormalidad'], $datos['tcMedidor'], $datos['tcCategoria'], $datos['DataBaseAlias']);
+                    $Consumo, $datos['tcMedidorAnormalidad'], $datos['tcMedidor'], $datos['tcCategoria'], $datos['tcCobro'], $datos['DataBaseAlias']);
 
                 if ($lnResult != 0) {
                     $this->nError = $this->ID_Clase + $lnResult;
@@ -87,16 +87,18 @@ class GeneracionLecturaBLL{
                 $lnResult = $this->ValidarLectura($datos['tcCliente'], $datos['tcGeneracionLectura'], 
                     $datos['tcLecturaActual'], $Consumo, $datos['tcMedidorAnormalidad'], $datos['tcMedia'], $lnConsumoMinimo);
 
-                $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria']);
+                if($this->gnAnormalidadEspecial == 0){
+                    $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria'], $datos['DataBaseAlias']);
 
-                if ($llSeValida == true) {
-                    if ($lnResult != 0) {
-                        $this->nError = $this->ID_Clase + $lnResult;
-                        return $this->ResultadoModificacionLecturaCliente();
+                    if ($llSeValida == true) {
+                        if ($lnResult != 0) {
+                            $this->nError = $this->ID_Clase + $lnResult;
+                            return $this->ResultadoModificacionLecturaCliente();
+                        }
+                    }else {
+                        $lnResult = 0;
+                        $this->nError = 0;
                     }
-                }else {
-                    $lnResult = 0;
-                    $this->nError = 0;
                 }
 
                 // 3.- COPIAR LECTURAS A MODIFICAIONGENERACIONLECTURA
@@ -104,9 +106,13 @@ class GeneracionLecturaBLL{
                     $lnResult = $this->DO_CopiarToModGenLe($datos['tcCliente'], $datos['tcGeneracionLectura'], $datos['tnGlosa']);
                 }
 
-                // 4.- APLICAR REGLA DE LECTURACION
-                if ($lnResult == 0) {
-                    $lnResult = $this->AplicarRegla($llSeValida);
+                if($this->gnAnormalidadEspecial == 0) {
+                    // 4.- APLICAR REGLA DE LECTURACION
+                    if ($lnResult == 0) {
+                        $lnResult = $this->AplicarRegla($llSeValida);
+                    }
+                } else {
+                    $lnResult = $this->AplicarRegla(false);
                 }
 
                 // // 5.- RESULTADO DE LA LECTURACION VALIDADA
@@ -120,7 +126,7 @@ class GeneracionLecturaBLL{
         }
 
         public function InicializarCampos($tcCliente, $tcGeneracionLectura, $tcLecturaActual, 
-                    $Consumo, $tcMedidorAnormalidad, $tcMedidor, $tcCategoria, $DataBaseAlias){
+                    $Consumo, $tcMedidorAnormalidad, $tcMedidor, $tcCategoria, $tcCobro, $DataBaseAlias){
             try {
                 // CAMPOS PARA LA TABLA GENERACIONLECTURA
                 $this->gnCliente            = $tcCliente;
@@ -143,6 +149,7 @@ class GeneracionLecturaBLL{
                 $this->InspeccionRequerido     = false;
                 $this->Facturado               = false;
                 $this->ValidoLectura           = false;
+                $this->gnCobro                 = $tcCobro;
 
                 $this->DataBaseAlias           = $DataBaseAlias;
                 $texto["ConsumoActual"] = "ConsumoActual".$this->gnConsumoActual;
@@ -156,12 +163,7 @@ class GeneracionLecturaBLL{
 
         public function ValidarLectura($tcCliente, $tcGeneracionLectura, 
                 $tcLecturaActual, $Consumo, $tcMedidorAnormalidad, $tcMedia, $tnConsumoMinimo){
-
-            echo "Validar Lectura";
-            // $this->nError = $this->PreValidacion();
-            // if($this->nError == 1) return $this->nError;
-            // echo "Pre Validar Lectura";
-
+            $this->gnConsumoMinimo = $tnConsumoMinimo[0]->ConsumoMinimo;
             $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
             $GeneracionLecturaDAL = new GeneracionLecturaDAL;
             $lnLecturaAnteriorDAL = $GeneracionLecturaDAL->GetRecDt2($tcGeneracionLectura, $tcCliente, $this->DataBaseAlias);
@@ -169,6 +171,11 @@ class GeneracionLecturaBLL{
             $lnResult = 0;
             $this->gnMedia = $tcMedia;
             $this->gnLecturaAnterior = $lnLecturaAnteriorDAL[0]->LecturaAnterior;
+            
+            $this->nError = $this->PreValidacion();
+            if($this->nError == 1) {
+                return 0;
+            }
 
             // TIPO DE COMPORTAMIENTO
             $this->nError = $this->GetTipoComportamiento($tcCliente, $tcGeneracionLectura, $tcLecturaActual);
@@ -276,6 +283,7 @@ class GeneracionLecturaBLL{
 
         // TOOD: Implementado el 20/8/2023
         public function PreValidacion(){
+            $this->gnAnormalidadEspecial = 0;
             // TOD: Se le aumentó $this->gnGeneracionFactura y $this->DataBaseAlias
             $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro, $this->DataBaseAlias);
             if($this->oAnormalidadCorrectaBLL->cError != ""){
@@ -284,8 +292,8 @@ class GeneracionLecturaBLL{
 
             if(($lnEsInstalacionNueva == 0) || ($lnEsInstalacionNueva == 1)){
                 // $lnId_MediEst = $ID_Nuevo; //pGlobal.ID_Nuevo
-                // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
+                // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                 // $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(8);
 
                 if($lnEsInstalacionNueva == 0){
@@ -293,16 +301,17 @@ class GeneracionLecturaBLL{
                     $this->cMessage = $lcErrorEsInstalacionNueva;
                 }
 
+                $this->gnAnormalidadEspecial = 1;
                 return 1;
             }else{
-                $lnEsCambioMedidor = $this->oAnormalidadCorrectaBLL->EsCambioDeMedidor($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
+                $lnEsCambioMedidor = $this->oAnormalidadCorrectaBLL->EsCambioDeMedidor($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                 if($this->oAnormalidadCorrectaBLL->cError == ""){
                     $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->cError;
                 }
 
                 if(($lnEsCambioMedidor == 0) || ($lnEsCambioMedidor == 1)){
-                    // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                    AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
+                    // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                    $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                     // $lcErrorEsCambioMedidor = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(9);
 
                     if($lnEsInstalacionNueva == 0){
@@ -310,16 +319,17 @@ class GeneracionLecturaBLL{
                         $this->cMessage = $lcErrorEsCambioMedidor;
                     }
 
+                    $this->gnAnormalidadEspecial = 2;
                     return 1;
                 }else{
-                    $lnEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->EsRegularizacionBajaTemporal($this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
+                    $lnEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->EsRegularizacionBajaTemporal($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->DataBaseAlias);
                     if($this->oAnormalidadCorrectaBLL->cError == ""){
                         $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->cError;
                     }
 
                     if(($lnEsRegulaBajaTemporal == 0) || ($lnEsRegulaBajaTemporal == 1)){
-                        // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                        AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
+                        // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                        $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                         // $lcErrorEsRegulaBajaTemporal = $this->oAnormalidadCorrectaBLL->GetErrorMsgBy(10);
 
                         if($lnEsInstalacionNueva == 0){
@@ -327,6 +337,7 @@ class GeneracionLecturaBLL{
                             $this->cMessage = $lcErrorEsRegulaBajaTemporal;
                         }
                         
+                        $this->gnAnormalidadEspecial = 3;
                         return 1;
                     }else{
                         if(!$llSeValida){
@@ -338,8 +349,8 @@ class GeneracionLecturaBLL{
                         }
 
                         if(($Consumo <= 0 || $ConsumoFacturado == 0) && $MedidorAnormalidad == 0){
-                            // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                            AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
+                            // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
 
                             if($nLectAct > 0) 
                                 $Consumo = $nConsumo;
@@ -347,17 +358,19 @@ class GeneracionLecturaBLL{
                                 // REPLACE TEMPORAL.Consumo WITH IIF(THISFORM.oGenLect.nConsumo < 0, 0, THISFORM.oGenLect.nConsumo)
 
                         }else{
-                            // AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                            AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
+                            // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
+                            $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                         }
                     }
                 }
             }
 
-            if($MostrarMedidorInfoAlValidar){
-                // lcMsg = THISFORM.oGenLect.oMedidorInfo.ToString()
-                // MESSAGEBOX( lcMsg, 0, "Aviso")
-            }
+            // echo "Pre Validar Lectura Línea 360 ERROR: ";
+            // if($MostrarMedidorInfoAlValidar){
+            //     echo "Pre Validar Lectura Línea 362 ERROR: ".$MostrarMedidorInfoAlValidar;
+            //     // lcMsg = THISFORM.oGenLect.oMedidorInfo.ToString()
+            //     // MESSAGEBOX( lcMsg, 0, "Aviso")
+            // }
             return 0; //&& Salimos sin restricciones.
         }
 
@@ -699,13 +712,13 @@ class GeneracionLecturaBLL{
             }
         }
 
-        public function SeValida($tcMedia, $Consumo, $tcCategoria){
+        public function SeValida($tcMedia, $Consumo, $tcCategoria, $DataBaseAlias){
             $MediaConsumoDAL = new MediaConsumoDAL;
             $lnValorRef = 15;
             $llSeValida = true;
     
             if ($tcCategoria > 0) {
-                $lnResult = CategoriaConsumo::on('mysql_LMCoopaguas')
+                $lnResult = CategoriaConsumo::on($DataBaseAlias)
                     ->where('Categoria', '=', $tcCategoria)
                     ->where('Inicio', '=', '0')->get();
     
@@ -1002,13 +1015,13 @@ class GeneracionLecturaBLL{
             }
         }
 
-        public function AplicarRegla($llSeValida){
+        public function AplicarRegla($tlSeValida){
             $MedidorAnormalidadDAL = new MedidorAnormalidadDAL;
             $this->verificarConsumoFacturado();
 
             $lnResult = 0;
             $TipoReglaAplicar = $MedidorAnormalidadDAL->Get_TipoReglaAAplicar($this->gnMedidorAnormalidad, $this->DataBaseAlias);
-            if ($llSeValida == false) {
+            if ($tlSeValida == false) {
                 $lnResult = $this->Aplicar_LecturaActual();
             }else{
                 if (($this->gnMedidorAnormalidad == 0) && (($this->gnTipoConsumo == $this->TipoConsumo->ConsumoNormal) || ($this->gnConsumoActual <= $this->gnConsumoMinimo))) {
@@ -1024,8 +1037,8 @@ class GeneracionLecturaBLL{
                     case 6: $lnResult = $this->Aplicar_ConsumoAsignado(); break;
                     case 7: $lnResult = $this->Aplicar_AjusteLectura(); break;
                     case 8: $lnResult = $this->Aplicar_InstalacionNueva(); break;
-                    // case 9: $lnResult = $this->Aplicar_CambioDeMedidor(); break;
-                    // case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal(); break;
+                    case 9: $lnResult = $this->Aplicar_CambioDeMedidor(); break;
+                    case 10: $lnResult = $this->Aplicar_RegularizacionBajaTemporal(); break;
                 }
             }
             return $lnResult;
@@ -1287,6 +1300,14 @@ class GeneracionLecturaBLL{
         }
 
         public function Aplicar_InstalacionNueva(){
+            return 0;
+        }
+
+        public function Aplicar_CambioDeMedidor(){
+            return 0;
+        }
+
+        public function Aplicar_RegularizacionBajaTemporal(){
             return 0;
         }
 

@@ -836,6 +836,7 @@ class GeneracionLecturaController extends Controller
         $laGeneracionLectura['DataBaseAlias']        = $request->input('DataBaseAlias');
         $laGeneracionLectura['tnPlomero']            = $request->input('tnPlomero');
         $laGeneracionLectura['tnGlosa']              = $request->input('tnGlosa');
+        $laGeneracionLectura['tcCobro']              = $request->input('tnCobro');
 
         $SocioConMedidor = $this->DO_CargarMedidorYConsumoAsignado($request->tnCliente, $request->DataBaseAlias);
 

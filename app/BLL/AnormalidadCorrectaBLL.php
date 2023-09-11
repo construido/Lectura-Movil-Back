@@ -72,8 +72,8 @@ class AnormalidadCorrectaBLL
         $loParametroLectura = $loParametroLectura->GetAlldt(1, $DataBaseAlias);
 
         $loGeneracionFactura = GeneracionFacturaDAL::GetRecDt($GeneracionFactura, $DataBaseAlias);
-        $FechaInicio = $loGeneracionFactura[0]->FechaGeneracionLectura - $loParametroLectura[0]->DiasDeInstalacion; // obtener de la tabla ParametroLectura - DiasDeInstalacion
-        $FechaFin = $loGeneracionFactura[0]->FechaGeneracionLectura - 31;
+        $FechaInicio = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- {$loParametroLectura[0]->DiasDeInstalacion} days")); // obtener de la tabla ParametroLectura - DiasDeInstalacion
+        $FechaFin = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- 31 days"));
         $zona = $loGeneracionFactura[0]->Zona < 10 ? '0'.$loGeneracionFactura[0]->Zona : $loGeneracionFactura[0]->Zona;
         $ruta = $loGeneracionFactura[0]->Ruta < 10 ? '0'.$loGeneracionFactura[0]->Ruta : $loGeneracionFactura[0]->Ruta;
         $ZonaRuta = $zona . $ruta;
@@ -81,7 +81,6 @@ class AnormalidadCorrectaBLL
         try {
             $loInstalacionNueva = new InstalacionMedidorDAL;
             $loInstalacionNueva = $loInstalacionNueva->instalacionNueva($FechaInicio, $FechaFin, $ZonaRuta, $DataBaseAlias);
-            
             if(count($loInstalacionNueva) > 0){ // obtener de la tabla InstalacionMedidor
                 $llResult = ($loInstalacionNueva[0]->NuevaInstalacion == 1); // obtener de la tabla InstalacionMedidor - cINSTALAM.NuevaInstalacion = 1
             }
@@ -108,39 +107,39 @@ class AnormalidadCorrectaBLL
     }
 
     public function CantidadLecturas($tcCobro, $Cliente, $DataBaseAlias){
-            $lnResult = 0;
+        $lnResult = 0;
 
-            try {
-                // $loHistoricoFactura = "SELECT ID_SOCIO, Count(*) AS Cantidad "+;
-                //         "  FROM _HISTLECT "+;
-                //         " WHERE ID_SOCIO = " + oMySQL.Fox2SQL(Cliente) +;
-                //         "   AND COBRO <= " + oMySQL.Fox2SQL(tcCobro) +;
-                //         " GROUP BY ID_SOCIO"
-                // oMySQL.EjecutarCursor(lcSQL, "curNuevaInsta", THIS.DataSession) // obtener datos de la tabla HistoricoFactura
+        try {
+            // $loHistoricoFactura = "SELECT ID_SOCIO, Count(*) AS Cantidad "+;
+            //         "  FROM _HISTLECT "+;
+            //         " WHERE ID_SOCIO = " + oMySQL.Fox2SQL(Cliente) +;
+            //         "   AND COBRO <= " + oMySQL.Fox2SQL(tcCobro) +;
+            //         " GROUP BY ID_SOCIO"
+            // oMySQL.EjecutarCursor(lcSQL, "curNuevaInsta", THIS.DataSession) // obtener datos de la tabla HistoricoFactura
 
-                $loHistoricoFactura = new HistoricoFacturaDAL;
-                $loHistoricoFactura = $loHistoricoFactura->historicoFacturaCantidad($Cliente, $tcCobro, $DataBaseAlias);
+            $loHistoricoFactura = new HistoricoFacturaDAL;
+            $loHistoricoFactura = $loHistoricoFactura->historicoFacturaCantidad($Cliente, $tcCobro, $DataBaseAlias);
 
-                if(count($loHistoricoFactura)){
-                    $lnResult = $loHistoricoFactura[0]->Cantidad; // obtener datos de la tabla HistoricoFactura - Cantidad
-                }
-            } catch (Exception $th) {
-                $lnResult = -1;
-                $lcLog ="   ProcedureInitial: GenLect.CantidadLecturas()";
-                // oError.Guardar($th, $lcLog)
+            if(count($loHistoricoFactura)){
+                $lnResult = $loHistoricoFactura[0]->Cantidad; // obtener datos de la tabla HistoricoFactura - Cantidad
             }
-            
-            return $lnResult;
+        } catch (Exception $th) {
+            $lnResult = -1;
+            $lcLog ="   ProcedureInitial: GenLect.CantidadLecturas()";
+            // oError.Guardar($th, $lcLog)
+        }
+        
+        return $lnResult;
     }
 
-    public function EsCambioDeMedidor($MedidorAnormalidad, $Cliente, $DataBaseAlia){
+    public function EsCambioDeMedidor($GeneracionFactura, $MedidorAnormalidad, $Cliente, $DataBaseAlias){
         $loParametroLectura = new ParametroLecturaDAL;
         $loParametroLectura = $loParametroLectura->GetAlldt(1, $DataBaseAlias);
         $ID_Cambio = $loParametroLectura[0]->AnormalidadCambioMedidor;
 
         $loGeneracionFactura = GeneracionFacturaDAL::GetRecDt($GeneracionFactura, $DataBaseAlias);
-        $FechaInicio = $loGeneracionFactura[0]->FechaGeneracionLectura - $loParametroLectura[0]->DiasDeInstalacion; // obtener de la tabla ParametroLectura - DiasDeInstalacion
-        $FechaFin = $loGeneracionFactura[0]->FechaGeneracionLectura - 31;
+        $FechaInicio = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- {$loParametroLectura[0]->DiasDeInstalacion} days")); // obtener de la tabla ParametroLectura - DiasDeInstalacion
+        $FechaFin = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- 31 days"));
         $zona = $loGeneracionFactura[0]->Zona < 10 ? '0'.$loGeneracionFactura[0]->Zona : $loGeneracionFactura[0]->Zona;
         $ruta = $loGeneracionFactura[0]->Ruta < 10 ? '0'.$loGeneracionFactura[0]->Ruta : $loGeneracionFactura[0]->Ruta;
         $ZonaRuta = $zona . $ruta;
@@ -150,21 +149,21 @@ class AnormalidadCorrectaBLL
 
         if($ID_Cambio > 0){ // obtener desde ParametroLectura - AnormalidadCambioMedidor > 0
 
-        //     ldFechaFin = tdFechaLect - pGlobal.DiasInstal // obtener de la tabla ParametroLectura - DiasDeInstalacion
-        //     ldFechaIni = tdFechaLect - 31
+            //     ldFechaFin = tdFechaLect - pGlobal.DiasInstal // obtener de la tabla ParametroLectura - DiasDeInstalacion
+            //     ldFechaIni = tdFechaLect - 31
 
-        //     lcSQL = " SELECT I.ID_SOCIMED, I.ID_Socio, I.COD_SOCIO, I.LectIni AS LectAnt, I.F_SociMed, " +;
-        //     oMySQL.Fox2SQL(ldFechaIni) + " AS FechaAct, I.F_Trabajo, I.F_Facturar " +;
-        //   "   FROM SOCIMEDI I " +;
-        //   "  WHERE I.F_Facturar >= " + oMySQL.Fox2SQL(ldFechaIni) +;
-        //   "    AND I.F_Facturar <= " + oMySQL.Fox2SQL(ldFechaFin) +;
-        //   "    AND I.Es_SociMed = 2" +;
-        //   "    AND SUBSTR(I.Cod_Socio,1,4) = " + oMySQL.FOX2SQL(tcZonaRuta) +;
-        //   "  ORDER BY I.Cliente DESC"
-        //     oMySQL.Ejecutar(lcSQL, "_SOCIMEDI", THIS.DataSession) // obtener de la tabla InstalacionMedidor
+            //     lcSQL = " SELECT I.ID_SOCIMED, I.ID_Socio, I.COD_SOCIO, I.LectIni AS LectAnt, I.F_SociMed, " +;
+            //     oMySQL.Fox2SQL(ldFechaIni) + " AS FechaAct, I.F_Trabajo, I.F_Facturar " +;
+            //   "   FROM SOCIMEDI I " +;
+            //   "  WHERE I.F_Facturar >= " + oMySQL.Fox2SQL(ldFechaIni) +;
+            //   "    AND I.F_Facturar <= " + oMySQL.Fox2SQL(ldFechaFin) +;
+            //   "    AND I.Es_SociMed = 2" +;
+            //   "    AND SUBSTR(I.Cod_Socio,1,4) = " + oMySQL.FOX2SQL(tcZonaRuta) +;
+            //   "  ORDER BY I.Cliente DESC"
+            //     oMySQL.Ejecutar(lcSQL, "_SOCIMEDI", THIS.DataSession) // obtener de la tabla InstalacionMedidor
 
-        $loClienteMedidor = new ClienteMedidorDAL;
-        $loClienteMedidor = $loClienteMedidor->getAll($Cliente, $DataBaseAlia);
+            $loClienteMedidor = new ClienteMedidorDAL;
+            $loClienteMedidor = $loClienteMedidor->getAll($Cliente, $DataBaseAlias);
 
             if($ID_Cambio == $MedidorAnormalidad){ // obtener desde ParametroLectura - AnormalidadCambioMedidor > 0
                 $lnResult = 0;
@@ -191,14 +190,14 @@ class AnormalidadCorrectaBLL
         return $lnResult;
     }
 
-    public function EsRegularizacionBajaTemporal($MedidorAnormalidad, $Cliente, $DataBaseAlia){
+    public function EsRegularizacionBajaTemporal($GeneracionFactura, $MedidorAnormalidad, $Cliente, $DataBaseAlias){
         $loParametroLectura = new ParametroLecturaDAL;
         $loParametroLectura = $loParametroLectura->GetAlldt(1, $DataBaseAlias);
         $ID_Regula = $loParametroLectura[0]->AnormalidadRegularizacionBajaTemporal;
 
         $loGeneracionFactura = GeneracionFacturaDAL::GetRecDt($GeneracionFactura, $DataBaseAlias);
-        $FechaInicio = $loGeneracionFactura[0]->FechaGeneracionLectura - $loParametroLectura[0]->DiasDeInstalacion; // obtener de la tabla ParametroLectura - DiasDeInstalacion
-        $FechaFin = $loGeneracionFactura[0]->FechaGeneracionLectura - 31;
+        $FechaInicio = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- {$loParametroLectura[0]->DiasDeInstalacion} days")); // obtener de la tabla ParametroLectura - DiasDeInstalacion
+        $FechaFin = date("d-m-Y",strtotime($loGeneracionFactura[0]->FechaGeneracionLectura."- 31 days"));
         $zona = $loGeneracionFactura[0]->Zona < 10 ? '0'.$loGeneracionFactura[0]->Zona : $loGeneracionFactura[0]->Zona;
         $ruta = $loGeneracionFactura[0]->Ruta < 10 ? '0'.$loGeneracionFactura[0]->Ruta : $loGeneracionFactura[0]->Ruta;
         $ZonaRuta = $zona . $ruta;
@@ -226,8 +225,7 @@ class AnormalidadCorrectaBLL
             //     oMySQL.Ejecutar(lcSQL, "_INSTALAM2", THIS.DataSession) // obtener de la tabla InstalacionMedidor
 
             $loInstalacionMedidor = new InstalacionMedidorDAL;
-            $loInstalacionMedidor = $loInstalacionMedidor->obtenerCliente($Cliente, $DataBaseAlia);
-
+            $loInstalacionMedidor = $loInstalacionMedidor->obtenerCliente($Cliente, $DataBaseAlias);
             // lcSQL = " SELECT I.* " +;
             // "   FROM _INSTALAM2 I " +;
             // "  WHERE I.ID_Socio = " + oMySQL.FOX2SQL(tnID_Socio)

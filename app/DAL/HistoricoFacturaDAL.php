@@ -40,5 +40,7 @@ class HistoricoFacturaDAL
         ->where('Cobro', '<=', $Cobro)
         // ->groupBy('Cliente')
         ->get();
+
+        return $loHistoricoFactura;
     }
 }
