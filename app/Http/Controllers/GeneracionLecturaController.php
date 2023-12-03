@@ -625,14 +625,16 @@ class GeneracionLecturaController extends Controller
 
     public function BuscarAnormalidadCategorizar($Anormalidad, $lnDataBaseAlias){
         $loCategoria = ParametroLectura::on($lnDataBaseAlias)->where('AnormalidadVerificarCategoria', '=', $Anormalidad)->get();
-        $loCategoria = isset($loCategoria[0]->AnormalidadVerificarCategoria) ? true : false;
+        if(count($loCategoria) > 0) $loCategoria = $loCategoria[0]->AnormalidadVerificarCategoria > 0 ? true : false;
+        else $loCategoria = false;
 
         return $loCategoria;
     }
 
     public function BuscarAnormalidadPendiente($Anormalidad, $lnDataBaseAlias){
         $loPendiente = ParametroLectura::on($lnDataBaseAlias)->where('AnormalidadPendiente', '=', $Anormalidad)->get();
-        $loPendiente = isset($loPendiente[0]->AnormalidadPendiente) ? true : false;
+        if(count($loPendiente) > 0) $loPendiente = $loPendiente[0]->AnormalidadPendiente > 0 ? true : false;
+        else $loPendiente = false;
 
         return $loPendiente;
     }
@@ -856,6 +858,7 @@ class GeneracionLecturaController extends Controller
             $loGeneracionLectura['Error'] = 2000;
         }else{
             $loGeneracionLectura = $loGeneracionLecturaBLL->ModificarYValidarLectura($laGeneracionLectura);
+            // return $loGeneracionLectura;
         }
 
         if ($loGeneracionLectura['Error'] == 2000) {

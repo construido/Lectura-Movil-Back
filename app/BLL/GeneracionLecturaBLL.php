@@ -171,11 +171,6 @@ class GeneracionLecturaBLL{
             $lnResult = 0;
             $this->gnMedia = $tcMedia;
             $this->gnLecturaAnterior = $lnLecturaAnteriorDAL[0]->LecturaAnterior;
-            
-            $this->nError = $this->PreValidacion();
-            if($this->nError == 1) {
-                return 0;
-            }
 
             // TIPO DE COMPORTAMIENTO
             $this->nError = $this->GetTipoComportamiento($tcCliente, $tcGeneracionLectura, $tcLecturaActual);
@@ -278,11 +273,17 @@ class GeneracionLecturaBLL{
                     $lnResult = $this->AnormalidadCorrecta($tcMedidorAnormalidad, $this->gnTipoConsumo, $this->MedidorInfo->MedidorTipoComportamiento);
                 }
             }
-            return $lnResult;
+
+            $this->nError = $this->verificarAnormalidadesEspeciales();
+            if($this->nError == 1) {
+                return 0;
+            } else {
+                return $lnResult;
+            }
         }
 
         // TOOD: Implementado el 20/8/2023
-        public function PreValidacion(){
+        public function verificarAnormalidadesEspeciales(){
             $this->gnAnormalidadEspecial = 0;
             // TOD: Se le aumentó $this->gnGeneracionFactura y $this->DataBaseAlias
             $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro, $this->DataBaseAlias);
@@ -339,8 +340,9 @@ class GeneracionLecturaBLL{
                         
                         $this->gnAnormalidadEspecial = 3;
                         return 1;
-                    }else{
-                        if(!$llSeValida){
+                    }
+                    /* else{
+                        if(!$llSeValida){ // TODO: hacer seguimiento
                             $lcTipoConsumoNombre = GetTipoConsumo($nTipoConsumo);
                             if($MostrarConsumoMenorFactorMinimo) $lcError = "[Informativo][" . $lcTipoConsumoNombre . "]";
                             else $lcError = "";
@@ -361,7 +363,7 @@ class GeneracionLecturaBLL{
                             // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
                             $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
                         }
-                    }
+                    } */
                 }
             }
 
