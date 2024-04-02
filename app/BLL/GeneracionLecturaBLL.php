@@ -89,6 +89,7 @@ class GeneracionLecturaBLL{
 
                 if($this->gnAnormalidadEspecial == 0){
                     $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria'], $datos['DataBaseAlias']);
+                    // GuardarErrores::GuardarLog(0, "lnResult = this->SeValida() - $llSeValida", 0, 0, 0);
 
                     if ($llSeValida == true) {
                         if ($lnResult != 0) {
@@ -257,6 +258,7 @@ class GeneracionLecturaBLL{
                         $this->gnConsumoActual = $this->MedidorInfo->MedidorConsumo;
                         if ($this->nErrorAdvertencia == 0) {
                             $this->cMessage = 'Seleccione Anormalidad Válida';
+                            // GuardarErrores::GuardarLog(0, $this->cMessage, $lnResult, 0, 0);
                         }
                     }
                 }
@@ -730,7 +732,7 @@ class GeneracionLecturaBLL{
             }
             
             if ($Consumo > 0) {
-                $llSeValida = $MediaConsumoDAL->SeValida($tcMedia, $Consumo, $lnValorRef);
+                $llSeValida = $MediaConsumoDAL->SeValida($tcMedia, $Consumo, $lnValorRef, $DataBaseAlias);
             }else {
                 $llSeValida = true;
             }

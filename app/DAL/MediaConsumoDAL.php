@@ -10,8 +10,8 @@ class MediaConsumoDAL
     public $MenorIgualQue = "MEI";
     public $MayorQue = "MAQ";
 
-    public function SeValida($tcMedia, $Consumo, $lnValorRef){
-        $loMediaConsumo = MediaConsumo::on('mysql_LMCoopaguas')->get();
+    public function SeValida($tcMedia, $Consumo, $lnValorRef, $DataBaseAlias){
+        $loMediaConsumo = MediaConsumo::on($DataBaseAlias)->get();
 
         $lcLog = "";
         $llValidar = true;
