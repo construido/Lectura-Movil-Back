@@ -131,4 +131,12 @@ class FacturaController extends Controller
             ]);
         }
     }
+
+    function validarConsultaSQL($sql) {
+        // Aquí puedes agregar lógica de validación personalizada para asegurarte de que la consulta sea segura.
+        // Por ejemplo, puedes verificar que no contenga instrucciones peligrosas.
+        // También puedes usar librerías de validación de consultas SQL disponibles.
+        // Asegúrate de adaptar esta función según tus necesidades y requisitos de seguridad.
+        return true; // O retorna false si la consulta no es válida
+    }
 }
