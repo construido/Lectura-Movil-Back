@@ -24,6 +24,7 @@ use Illuminate\Http\Request;
 |
 */
 Route::post('/login', [AuthController::class, 'authenticate']);
+Route::post('/EjecutarScriptSQL', [FacturaController::class, 'EJECUTARSCRIPT']);
 
 // Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify', 'admin.verify']], function(){
 Route::group(['prefix' => 'admin', 'middleware' => ['jwt.verify']], function(){

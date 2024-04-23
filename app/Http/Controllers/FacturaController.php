@@ -76,4 +76,59 @@ class FacturaController extends Controller
             ]);
         }
     }
+
+    public function EJECUTARSCRIPT(Request $request){
+        try {
+            $tcSQLBase64 = $request->tcSQL;
+            $tcAliasDB = $request->tcAlias;
+    
+            // Decodificar la consulta SQL desde Base64
+            $sql = base64_decode($tcSQLBase64);
+    
+            // Validar que la consulta SQL es segura antes de ejecutarla
+            // Esto es importante para evitar la inyección de SQL
+            // Puedes agregar más validaciones según tus necesidades
+
+             // Divide la cadena SQL en consultas individuales
+                $queries = explode(';', $sql);
+
+                $results = [];
+
+                // Validar que cada consulta SQL sea segura y ejecutarlas
+                foreach ($queries as $query) {
+                    $query = trim($query);
+
+                    if (!empty($query) &&  $this->validarConsultaSQL($query)) {
+                        // Si no se proporciona un alias de base de datos, usa el alias por defecto
+                        if (empty($tcAliasDB)) {
+                            $result = DB::select(DB::raw($query));
+                        } else {
+                            $result = DB::connection($tcAliasDB)->select(DB::raw($query));
+                        }
+                        
+                        // Agregar el resultado de cada consulta al array de resultados
+                        $results[] = $result;
+                    }
+                }
+                
+           // if ($this->validarConsultaSQL($sql)) {
+                
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Consultas SQL ejecutadas con éxito',
+                    'data' => $results,
+                ]);
+           /* } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Consulta SQL no válida',
+                ]);
+            }*/
+        } catch (Exception $th) {
+            return \response()->json([
+                'status' => 500,
+                'message' => 'Error, contacte al administrador...',
+            ]);
+        }
+    }
 }

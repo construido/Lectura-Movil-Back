@@ -7,6 +7,7 @@ use App\DAL\GeneracionFacturaDAL;
 use App\DAL\ParametroLecturaDAL;
 use App\DAL\HistoricoFacturaDAL;
 use App\DAL\ClienteMedidorDAL;
+use App\Modelos\GuardarErrores;
 
 use Exception;
 
@@ -21,31 +22,32 @@ class AnormalidadCorrectaBLL
         $ID_Nuevo = $loParametroLectura[0]->AnormalidadNuevo;
 
         $lnResult;
-        $llEsNuevaIns = false;
+        $llEsNuevaIns = 0;
         $lnCantidadLecturas = -1;
         $this->cError = "";
 
         try {
             $llTieneUnicoInstalam = $this->TieneUnicoInstalam($GeneracionFactura, $Cliente, $DataBaseAlias);
             $lnCantidadLecturas = $this->CantidadLecturas($tcCobro, $Cliente, $DataBaseAlias);
+            
             if($lnCantidadLecturas >= 0){
-                $llEsNuevaIns = ($lnCantidadLecturas <= $MesesNuevo); // obtener desde ParametroLectura - MesesNuevo
-                if(!$llEsNuevaIns) $llEsNuevaIns = $llTieneUnicoInstalam;
+                if($lnCantidadLecturas <= $MesesNuevo) $llEsNuevaIns = 1; // obtener desde ParametroLectura - MesesNuevo
+                if($llEsNuevaIns == 0) $llEsNuevaIns = $llTieneUnicoInstalam;
             }else{
                 $this->cError = "Error al Consultar Cantidad";
             }
-            
+
             if($ID_Nuevo > 0){ // obtener desde ParametroLectura - AnormalidadNuevo > 0
                 if($ID_Nuevo == $MedidorAnormalidad){ // obtener desde ParametroLectura - AnormalidadNuevo > 0
                     $lnResult = 0;
                     // THIS.ErrorMsg = "[Valido][Instalaci�n Nueva]"
-                    if(!$llEsNuevaIns){
-                        $lnResult = 1;
+                    if($llEsNuevaIns == 0){
+                        $lnResult = 2;
                         $this->cError = "[Error][No Tiene Instalaci�n Nueva el Asocciado]";
                     }
                 }else{
                     // &&Verificamos si no esta en la lista de los cambios en _SOCIMEDI
-                    if($llEsNuevaIns){
+                    if($llEsNuevaIns == 1){
                         $lnResult = 1;
                         $this->cError = "[Error][Tiene Instalaci�n Nueva el Asocciado]";
                     }else{
@@ -62,11 +64,12 @@ class AnormalidadCorrectaBLL
             // oError.Guardar($th, $lcLog)
         }
 
+        // GuardarErrores::GuardarLog(0, "R:".$lnResult, 0, 0, 0);
         return $lnResult;
     }
 
     public function TieneUnicoInstalam($GeneracionFactura, $Cliente, $DataBaseAlias){
-        $llResult = false;
+        $llResult = 0;
 
         $loParametroLectura = new ParametroLecturaDAL;
         $loParametroLectura = $loParametroLectura->GetAlldt(1, $DataBaseAlias);
@@ -82,7 +85,8 @@ class AnormalidadCorrectaBLL
             $loInstalacionNueva = new InstalacionMedidorDAL;
             $loInstalacionNueva = $loInstalacionNueva->instalacionNueva($FechaInicio, $FechaFin, $ZonaRuta, $DataBaseAlias);
             if(count($loInstalacionNueva) > 0){ // obtener de la tabla InstalacionMedidor
-                $llResult = ($loInstalacionNueva[0]->NuevaInstalacion == 1); // obtener de la tabla InstalacionMedidor - cINSTALAM.NuevaInstalacion = 1
+                if($loInstalacionNueva[0]->NuevaInstalacion == 1)
+                $llResult = 1; // obtener de la tabla InstalacionMedidor - cINSTALAM.NuevaInstalacion = 1
             }
         } catch (Exception $th) {
             $lcLog = "  ProcedureInitial: AnormalidadCorrectaBLL.TieneUnicoInstalam()";

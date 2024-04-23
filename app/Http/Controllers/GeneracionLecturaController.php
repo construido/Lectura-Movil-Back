@@ -860,7 +860,7 @@ class GeneracionLecturaController extends Controller
             $loGeneracionLectura = $loGeneracionLecturaBLL->ModificarYValidarLectura($laGeneracionLectura);
             // return $loGeneracionLectura;
         }
-        // GuardarErrores::GuardarLog(0, "DO_LecturarNormal()", $loGeneracionLectura['Error'], 0, 0);
+        // GuardarErrores::GuardarLog(0, "DO_LecturarNormal()", $loGeneracionLectura, 0, 0);
 
         if ($loGeneracionLectura['Error'] == 2000) {
             $loPaquete->values = $loGeneracionLectura;

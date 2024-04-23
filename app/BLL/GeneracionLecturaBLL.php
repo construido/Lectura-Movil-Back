@@ -89,7 +89,7 @@ class GeneracionLecturaBLL{
 
                 if($this->gnAnormalidadEspecial == 0){
                     $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria'], $datos['DataBaseAlias']);
-                    // GuardarErrores::GuardarLog(0, "lnResult = this->SeValida() - $llSeValida", 0, 0, 0);
+                    GuardarErrores::GuardarLog(0, "lnResult = this->SeValida() - $llSeValida", 0, 0, 0);
 
                     if ($llSeValida == true) {
                         if ($lnResult != 0) {
@@ -287,8 +287,10 @@ class GeneracionLecturaBLL{
         // TOOD: Implementado el 20/8/2023
         public function verificarAnormalidadesEspeciales(){
             $this->gnAnormalidadEspecial = 0;
+            $lcErrorEsInstalacionNueva = "";
             // TOD: Se le aumentó $this->gnGeneracionFactura y $this->DataBaseAlias
             $lnEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->EsInstalacionNueva($this->gnGeneracionFactura, $this->gnMedidorAnormalidad, $this->gnCliente, $this->gnCobro, $this->DataBaseAlias);
+            
             if($this->oAnormalidadCorrectaBLL->cError != ""){
                 $lcErrorEsInstalacionNueva = $this->oAnormalidadCorrectaBLL->cError;
             }
@@ -343,50 +345,12 @@ class GeneracionLecturaBLL{
                         $this->gnAnormalidadEspecial = 3;
                         return 1;
                     }
-                    /* else{
-                        if(!$llSeValida){ // TODO: hacer seguimiento
-                            $lcTipoConsumoNombre = GetTipoConsumo($nTipoConsumo);
-                            if($MostrarConsumoMenorFactorMinimo) $lcError = "[Informativo][" . $lcTipoConsumoNombre . "]";
-                            else $lcError = "";
-
-                            if($lnValido == 0) $lcError = "";
-                        }
-
-                        if(($Consumo <= 0 || $ConsumoFacturado == 0) && $MedidorAnormalidad == 0){
-                            // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                            $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
-
-                            if($nLectAct > 0) 
-                                $Consumo = $nConsumo;
-                            // else 
-                                // REPLACE TEMPORAL.Consumo WITH IIF(THISFORM.oGenLect.nConsumo < 0, 0, THISFORM.oGenLect.nConsumo)
-
-                        }else{
-                            // $this->AplicarRegla2($lnLectAnt, $lnLectAct, $lnConsumo, $lnMedia, $lnId_MediEst, $lnId_Medidor);
-                            $this->AplicarRegla2($this->gnLecturaAnterior, $this->gnLecturaActual, $this->gnConsumoActual, $this->gnMedia, $this->gnMedidorAnormalidad, $this->gnMedidor, $this->DataBaseAlias);
-                        }
-                    } */
                 }
             }
-
-            // echo "Pre Validar Lectura Línea 360 ERROR: ";
-            // if($MostrarMedidorInfoAlValidar){
-            //     echo "Pre Validar Lectura Línea 362 ERROR: ".$MostrarMedidorInfoAlValidar;
-            //     // lcMsg = THISFORM.oGenLect.oMedidorInfo.ToString()
-            //     // MESSAGEBOX( lcMsg, 0, "Aviso")
-            // }
+            
+            // GuardarErrores::GuardarLog(0, "IN:".$lnEsInstalacionNueva, 0, 0, 0);
             return 0; //&& Salimos sin restricciones.
         }
-
-        // public function validadConsumoMinimo(){
-        //     // obtener datos de la tabla Categoria = $this->gnCategoria;
-
-        //     if(count($loCategoria)){
-        //         if($loCategoria[0]->ConsumoMinimo > 0 && $this->gnConsumoFacturado < $loCategoria[0]->ConsumoMinimo){
-        //             $this->gnConsumoFacturado = $loCategoria[0]->ConsumoMinimo;
-        //         }
-        //     }
-        // }
 
         // TOOD: Implementado el 20/8/2023
         public function AplicarRegla2($tnLectAnt, $tnLectAct, $tnConsumo, $tnMedia, $MedidorAnormalidad, $Medidor, $DataBaseAlias){
