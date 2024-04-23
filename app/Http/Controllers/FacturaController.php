@@ -14,6 +14,7 @@ use App\DAL\FacturaDAL;
 
 use Illuminate\Http\Request;
 use App\Models\Usuario;
+use DB;
 
 class FacturaController extends Controller
 {
