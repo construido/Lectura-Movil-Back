@@ -128,7 +128,7 @@ class FacturaBLL
     }
 
     public function DO_RecalcularValoresLecturas($GeneracionFactura, $Cliente, $DataBaseAlias){
-        $lnConsumoFacturado = $this->goGeneracionLectura[0]->Consumo; // TODO: hace un recalculo para actualizar el campo ConsumoFacturado = Consumo
+        $lnConsumoFacturado = $this->goGeneracionLectura[0]->ConsumoFacturado; // TODO: hace un recalculo para actualizar el campo ConsumoFacturado = Consumo
         $MedidorAnormalidad = $this->MedidorAnormalidadDAL->GetRecDt($this->goGeneracionLectura[0]->MedidorAnormalidad, $DataBaseAlias); // TODO: reemplaza a GetIDBy(); por el momento
         $laDatosActualizar  = [];
         $laDatosActualizar['GeneracionFactura'] = $GeneracionFactura;

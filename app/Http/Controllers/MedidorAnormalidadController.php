@@ -35,6 +35,12 @@ class MedidorAnormalidadController extends Controller
      * @return      lista MEDIDORANORMALIDAD
      */
     public function llenarSelectAnormalidad(Request $request){
+        $result = new ParametroLecturaDAL();
+        $result = $result->GetAlldt(1, $request->tcDataBaseAlias);
+        $AN = $result[0]->AnormalidadNuevo;
+        $AC = $result[0]->AnormalidadCambioMedidor;
+        $AR = $result[0]->AnormalidadRegularizacionBajaTemporal;
+
         $lcDataBaseAlias = $request->tcDataBaseAlias;
         $lcOrden = $request->tcOrden;
         $lcTipo  = $request->tcTipo;
@@ -66,6 +72,7 @@ class MedidorAnormalidadController extends Controller
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->leftJoin('REGLALECTURACION', 'MEDIDORANORMALIDAD.Regla', '=', 'REGLALECTURACION.ReglaLecturacion')
                 ->where('REGLALECTURACION.Nombre', 'like', '%'.$lcDato.'%')
+                ->whereRaw("MEDIDORANORMALIDAD.MedidorAnormalidad NOT IN ($AN, $AC, $AR)")
                 ->orderBy($columna, $direccion)
                 ->paginate(6);
                 break;
@@ -76,6 +83,7 @@ class MedidorAnormalidadController extends Controller
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->leftJoin('REGLALECTURACION', 'MEDIDORANORMALIDAD.Regla', '=', 'REGLALECTURACION.ReglaLecturacion')
                 ->where('MEDIDORANORMALIDAD.NombreAnormalidad', 'like', '%'.$lcDato.'%')
+                ->whereRaw("MEDIDORANORMALIDAD.MedidorAnormalidad NOT IN ($AN, $AC, $AR)")
                 ->orderBy($columna, $direccion)
                 ->paginate(6);
                 break;
@@ -86,6 +94,7 @@ class MedidorAnormalidadController extends Controller
                 ->leftJoin('TIPOCONSUMO', 'MEDIDORANORMALIDAD.TipoConsumo', '=', 'TIPOCONSUMO.TipoConsumo')
                 ->leftJoin('REGLALECTURACION', 'MEDIDORANORMALIDAD.Regla', '=', 'REGLALECTURACION.ReglaLecturacion')
                 ->where('TIPOCONSUMO.Nombre', 'like', '%'.$lcDato.'%')
+                ->whereRaw("MEDIDORANORMALIDAD.MedidorAnormalidad NOT IN ($AN, $AC, $AR)")
                 ->orderBy($columna, $direccion)
                 ->paginate(6);
                 break;

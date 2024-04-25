@@ -325,6 +325,6 @@ class Cosphul //ImprimirBLL
         $path = public_path() . $file . '/' . $namePDF . '.pdf';
         $pdf->save($path);
         $host = $_SERVER["HTTP_HOST"];
-        return "http://" . $host . $file . '/' . $namePDF . '.pdf';
+        return "https://" . $host . $file . '/' . $namePDF . '.pdf';
     }
 }

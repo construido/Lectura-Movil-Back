@@ -89,7 +89,7 @@ class GeneracionLecturaBLL{
 
                 if($this->gnAnormalidadEspecial == 0){
                     $llSeValida = $this->SeValida($datos['tcMedia'], $Consumo, $datos['tcCategoria'], $datos['DataBaseAlias']);
-                    GuardarErrores::GuardarLog(0, "lnResult = this->SeValida() - $llSeValida", 0, 0, 0);
+                    // GuardarErrores::GuardarLog(0, "lnResult = this->SeValida() - $llSeValida", 0, 0, 0);
 
                     if ($llSeValida == true) {
                         if ($lnResult != 0) {
@@ -976,11 +976,12 @@ class GeneracionLecturaBLL{
         }
 
         public function verificarConsumoFacturado(){
-            if(($this->gnConsumoMinimo > 0) && (/*$this->gnConsumoFacturado*/$this->gnConsumoActual < $this->gnConsumoMinimo)){
+            if(($this->gnConsumoMinimo > 0) && ($this->gnConsumoActual < $this->gnConsumoMinimo)){
                 $this->gnConsumoFacturado = $this->gnConsumoMinimo;
             }else{
                 $this->gnConsumoFacturado = $this->gnConsumoActual;
             }
+            // GuardarErrores::GuardarLog(0, "verificarConsumoFacturado", $this->gnConsumoFacturado, 0, 0);
         }
 
         public function AplicarRegla($tlSeValida){

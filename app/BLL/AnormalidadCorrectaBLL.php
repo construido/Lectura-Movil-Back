@@ -22,17 +22,20 @@ class AnormalidadCorrectaBLL
         $ID_Nuevo = $loParametroLectura[0]->AnormalidadNuevo;
 
         $lnResult;
-        $llEsNuevaIns = 0;
+        $llEsNuevaIns = False;
         $lnCantidadLecturas = -1;
         $this->cError = "";
+        $llTieneUnicoInstalam=False;
 
         try {
             $llTieneUnicoInstalam = $this->TieneUnicoInstalam($GeneracionFactura, $Cliente, $DataBaseAlias);
             $lnCantidadLecturas = $this->CantidadLecturas($tcCobro, $Cliente, $DataBaseAlias);
             
             if($lnCantidadLecturas >= 0){
-                if($lnCantidadLecturas <= $MesesNuevo) $llEsNuevaIns = 1; // obtener desde ParametroLectura - MesesNuevo
-                if($llEsNuevaIns == 0) $llEsNuevaIns = $llTieneUnicoInstalam;
+                if($lnCantidadLecturas <= $MesesNuevo) 
+                    $llEsNuevaIns = True; // obtener desde ParametroLectura - MesesNuevo
+                if(!$llEsNuevaIns) 
+                    $llEsNuevaIns = $llTieneUnicoInstalam;
             }else{
                 $this->cError = "Error al Consultar Cantidad";
             }
@@ -41,13 +44,13 @@ class AnormalidadCorrectaBLL
                 if($ID_Nuevo == $MedidorAnormalidad){ // obtener desde ParametroLectura - AnormalidadNuevo > 0
                     $lnResult = 0;
                     // THIS.ErrorMsg = "[Valido][Instalaci�n Nueva]"
-                    if($llEsNuevaIns == 0){
+                    if(!$llEsNuevaIns){
                         $lnResult = 2;
                         $this->cError = "[Error][No Tiene Instalaci�n Nueva el Asocciado]";
                     }
                 }else{
                     // &&Verificamos si no esta en la lista de los cambios en _SOCIMEDI
-                    if($llEsNuevaIns == 1){
+                    if($llEsNuevaIns){
                         $lnResult = 1;
                         $this->cError = "[Error][Tiene Instalaci�n Nueva el Asocciado]";
                     }else{
